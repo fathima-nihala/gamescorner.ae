@@ -88,17 +88,25 @@ document.addEventListener("DOMContentLoaded", function () {
     .addEventListener("click", async function () {
       const otp = document.getElementById("otp").value;
       const email = document.getElementById("email").value;
+      const verifyButton = document.getElementById("verifyOtpButton");
+
+      verifyButton.disabled = true;
+      verifyButton.innerText = "Verifying...";
 
       try {
         const data = await verifyOtp(email, otp);
         document.getElementById("otpStatusMessage").innerText = data.message;
 
         if (data.success) {
-          // Proceed to the next step, e.g., allow password reset
-          // You can redirect the user or show a success message
+          alert("OTP verified successfully!");
+          window.location.href = "reset-password.html";
         }
       } catch (error) {
         document.getElementById("otpStatusMessage").innerText = error.message;
+      }
+      finally {
+        verifyButton.disabled = false;
+        verifyButton.innerText = "Verify OTP";
       }
     });
 });

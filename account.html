@@ -75,17 +75,7 @@
             <div class="mobile-menu__menu">
                 <!-- Nav Menu Start -->
                 <ul class="nav-menu flex-align nav-menu--mobile">
-                    <!-- <li class="on-hover-item nav-menu__item has-submenu">
-        <a href="javascript:void(0)" class="nav-menu__link">Home</a>
-        <ul class="on-hover-dropdown common-dropdown nav-submenu scroll-sm">
-            <li class="common-dropdown__item nav-submenu__item">
-                <a href="index-2.html" class="common-dropdown__link nav-submenu__link hover-bg-neutral-100"> Home One</a>
-            </li>
-            <li class="common-dropdown__item nav-submenu__item">
-                <a href="index-two.html" class="common-dropdown__link nav-submenu__link hover-bg-neutral-100"> Home Two</a>
-            </li>
-        </ul>
-    </li> -->
+
                     <li class="nav-menu__item">
                         <a href="index.html" class="nav-menu__link">Home</a>
                     </li>
@@ -396,7 +386,6 @@
                                         class="text-gray-500 text-15 py-12 px-16 flex-align gap-8 rounded-0">
                                         <span class="text-xl d-flex"><i class="ph ph-monitor"></i></span>
                                         <span>Monitors</span>
-                                        <!-- <span class="icon text-md d-flex ms-auto"><i class="ph ph-caret-right"></i></span> -->
                                     </a>
 
 
@@ -591,7 +580,7 @@
                                     <i class="ph ph-magnifying-glass"></i>
                                 </span>
                             </button>
-                      
+
                         </div>
                     </div>
                     <button type="button" class="toggle-mobileMenu d-lg-none ms-3n text-gray-800 text-4xl d-flex"> <i
@@ -659,82 +648,125 @@
             <form action="#">
                 <div class="row gy-4">
 
-                    <!-- Login Card Start -->
+                    <!-- Login Form HTML -->
                     <div class="col-xl-6 pe-xl-5">
                         <div
                             class="border border-gray-100 hover-border-main-600 transition-1 rounded-16 px-24 py-40 h-100">
                             <h6 class="text-xl mb-32">Login</h6>
-                            <div class="mb-24">
-                                <label for="username" class="text-neutral-900 text-lg mb-8 fw-medium">Username or email
-                                    address <span class="text-danger">*</span> </label>
-                                <input type="text" class="common-input" id="username" placeholder="First Name">
-                            </div>
-                            <div class="mb-24">
-                                <label for="password" class="text-neutral-900 text-lg mb-8 fw-medium">Password</label>
-                                <div class="position-relative">
-                                    <input type="password" class="common-input" id="password"
-                                        placeholder="Enter Password" value="password">
-                                    <span
-                                        class="toggle-password position-absolute top-50 inset-inline-end-0 me-16 translate-middle-y cursor-pointer ph ph-eye-slash"
-                                        id="#password"></span>
+                            <form id="loginForm" onsubmit="return false;">
+                                <div class="mb-24">
+                                    <label for="email" class="text-neutral-900 text-lg mb-8 fw-medium">
+                                        Email address <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="email" class="common-input" id="email" placeholder="Enter Email"
+                                        required>
                                 </div>
-                            </div>
-                            <div class="mb-24 mt-48">
-                                <div class="flex-align gap-48 flex-wrap">
-                                    <button type="submit" class="btn btn-main py-18 px-40">Log in</button>
-                                    <div class="form-check common-check">
-                                        <input class="form-check-input" type="checkbox" value="" id="remember">
-                                        <label class="form-check-label flex-grow-1" for="remember">Remember me</label>
+                                <div class="mb-24">
+                                    <label for="password" class="text-neutral-900 text-lg mb-8 fw-medium">
+                                        Password <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="position-relative">
+                                        <input type="password" class="common-input" id="password"
+                                            placeholder="Enter Password" required>
+                                        <span
+                                            class="toggle-password position-absolute top-50 inset-inline-end-0 me-16 translate-middle-y cursor-pointer ph ph-eye-slash"></span>
                                     </div>
                                 </div>
-                            </div>
+                                <div class="mb-24 mt-48">
+                                    <div class="flex-align gap-48 flex-wrap">
+                                        <button onclick="handleLogin()" class="btn btn-main py-18 px-40">Log in</button>
+                                    </div>
+                                </div>
+                            </form>
                             <div class="mt-48">
                                 <a href="forgot.html"
-                                    class="text-danger-600 text-sm fw-semibold hover-text-decoration-underline">Forgot
-                                    your password?</a>
+                                    class="text-danger-600 text-sm fw-semibold hover-text-decoration-underline">
+                                    Forgot your password?
+                                </a>
                             </div>
                         </div>
                     </div>
+
+
+                    <!-- <div class="col-xl-6 pe-xl-5">
+                        <div
+                            class="border border-gray-100 hover-border-main-600 transition-1 rounded-16 px-24 py-40 h-100">
+                            <h6 class="text-xl mb-32">Login</h6>
+                            <form id="loginForm" onsubmit="return false;">
+                                <div class="mb-24">
+                                    <label for="email" class="text-neutral-900 text-lg mb-8 fw-medium">
+                                        Email address <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="email" class="common-input" id="email" placeholder="Enter Email">
+                                </div>
+                                <div class="mb-24">
+                                    <label for="password" class="text-neutral-900 text-lg mb-8 fw-medium">
+                                        Password <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="position-relative">
+                                        <input type="password" class="common-input" id="password"
+                                            placeholder="Enter Password">
+                                        <span
+                                            class="toggle-password position-absolute top-50 inset-inline-end-0 me-16 translate-middle-y cursor-pointer ph ph-eye-slash"></span>
+                                    </div>
+                                </div>
+                                <div class="mb-24 mt-48">
+                                    <div class="flex-align gap-48 flex-wrap">
+                                        <button onclick="handleLogin()" class="btn btn-main py-18 px-40">Log in</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="mt-48">
+                                <a href="forgot.html"
+                                    class="text-danger-600 text-sm fw-semibold hover-text-decoration-underline">
+                                    Forgot your password?
+                                </a>
+                            </div>
+                        </div>
+                    </div> -->
                     <!-- Login Card End -->
 
                     <!-- Register Card Start -->
                     <div class="col-xl-6">
                         <div class="border border-gray-100 hover-border-main-600 transition-1 rounded-16 px-24 py-40">
                             <h6 class="text-xl mb-32">Register</h6>
-                            <div class="mb-24">
-                                <label for="usernameTwo" class="text-neutral-900 text-lg mb-8 fw-medium">Username <span
-                                        class="text-danger">*</span> </label>
-                                <input type="text" class="common-input" id="usernameTwo" placeholder="Write a username">
-                            </div>
-                            <div class="mb-24">
-                                <label for="emailTwo" class="text-neutral-900 text-lg mb-8 fw-medium">Email address
-                                    <span class="text-danger">*</span> </label>
-                                <input type="email" class="common-input" id="emailTwo"
-                                    placeholder="Enter Email Address">
-                            </div>
-                            <div class="mb-24">
-                                <label for="enter-password" class="text-neutral-900 text-lg mb-8 fw-medium">Password
-                                    <span class="text-danger">*</span></label>
-                                <div class="position-relative">
-                                    <input type="password" class="common-input" id="enter-password"
-                                        placeholder="Enter Password" value="password">
-                                    <span
-                                        class="toggle-password position-absolute top-50 inset-inline-end-0 me-16 translate-middle-y cursor-pointer ph ph-eye-slash"
-                                        id="#enter-password"></span>
+                            <form id="registrationForm">
+                                <div class="mb-24">
+                                    <label for="usernameTwo" class="text-neutral-900 text-lg mb-8 fw-medium">Username
+                                        <span class="text-danger">*</span></label>
+                                    <input type="text" class="common-input" id="usernameTwo"
+                                        placeholder="Write a username" required>
                                 </div>
-                            </div>
-                            <div class="my-48">
-                                <p class="text-gray-500">Your personal data will be used to process your order, support
-                                    your experience throughout this website, and for other purposes described in our
-                                    <a href="#" class="text-main-600 text-decoration-underline"> privacy policy</a>
-                                    .
-                                </p>
-                            </div>
-                            <div class="mt-48">
-                                <button type="submit" class="btn btn-main py-18 px-40">Register</button>
-                            </div>
+                                <div class="mb-24">
+                                    <label for="emailTwo" class="text-neutral-900 text-lg mb-8 fw-medium">Email address
+                                        <span class="text-danger">*</span></label>
+                                    <input type="email" class="common-input" id="emailTwo"
+                                        placeholder="Enter Email Address" required>
+                                </div>
+                                <div class="mb-24">
+                                    <label for="enter-password" class="text-neutral-900 text-lg mb-8 fw-medium">Password
+                                        <span class="text-danger">*</span></label>
+                                    <div class="position-relative">
+                                        <input type="password" class="common-input" id="enter-password"
+                                            placeholder="Enter Password" required>
+                                        <span
+                                            class="toggle-password position-absolute top-50 inset-inline-end-0 me-16 translate-middle-y cursor-pointer ph ph-eye-slash"
+                                            id="#enter-password"></span>
+                                    </div>
+                                </div>
+                                <div class="my-48">
+                                    <p class="text-gray-500">Your personal data will be used to process your order,
+                                        support
+                                        your experience throughout this website, and for other purposes described in our
+                                        href="#" class="text-main-600 text-decoration-underline">privacy policy</a>.</p>
+                                </div>
+                                <div class="mt-48">
+                                    <button type="submit" class="btn btn-main py-18 px-40">Register</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
+
                     <!-- Register Card End -->
 
                 </div>
@@ -1022,9 +1054,12 @@
     <script src="assets/js/count-down.js"></script>
     <!-- wow js -->
     <script src="assets/js/jquery-ui.js"></script>
-
     <!-- main js -->
     <script src="assets/js/main.js"></script>
+    <!-- login -->
+    <script src="assets/js/login.js"></script>
+    <!-- register -->
+    <script src="assets/js/register.js"></script>
 
 
 
