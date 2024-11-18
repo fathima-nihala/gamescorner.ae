@@ -133,60 +133,7 @@
                             </li>
                         </ul>
                     </li>
-                    <li class="on-hover-item border-right-item border-right-item-sm-space has-submenu arrow-white">
-                        <a href="javascript:void(0)" class="selected-text text-white text-sm py-8">Eng</a>
-                        <ul
-                            class="selectable-text-list on-hover-dropdown common-dropdown common-dropdown--sm max-h-200 scroll-sm px-0 py-8">
-                            <li>
-                                <a href="javascript:void(0)"
-                                    class="hover-bg-gray-100 text-gray-500 text-xs py-6 px-16 flex-align gap-8 rounded-0">
-                                    <img src="assets/images/thumbs/flag1.png" alt=""
-                                        class="w-16 h-12 rounded-4 border border-gray-100">
-                                    English
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0)"
-                                    class="hover-bg-gray-100 text-gray-500 text-xs py-6 px-16 flex-align gap-8 rounded-0">
-                                    <img src="assets/images/thumbs/flag2.png" alt=""
-                                        class="w-16 h-12 rounded-4 border border-gray-100">
-                                    Japan
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0)"
-                                    class="hover-bg-gray-100 text-gray-500 text-xs py-6 px-16 flex-align gap-8 rounded-0">
-                                    <img src="assets/images/thumbs/flag3.png" alt=""
-                                        class="w-16 h-12 rounded-4 border border-gray-100">
-                                    French
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0)"
-                                    class="hover-bg-gray-100 text-gray-500 text-xs py-6 px-16 flex-align gap-8 rounded-0">
-                                    <img src="assets/images/thumbs/flag4.png" alt=""
-                                        class="w-16 h-12 rounded-4 border border-gray-100">
-                                    Germany
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0)"
-                                    class="hover-bg-gray-100 text-gray-500 text-xs py-6 px-16 flex-align gap-8 rounded-0">
-                                    <img src="assets/images/thumbs/flag6.png" alt=""
-                                        class="w-16 h-12 rounded-4 border border-gray-100">
-                                    Bangladesh
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0)"
-                                    class="hover-bg-gray-100 text-gray-500 text-xs py-6 px-16 flex-align gap-8 rounded-0">
-                                    <img src="assets/images/thumbs/flag5.png" alt=""
-                                        class="w-16 h-12 rounded-4 border border-gray-100">
-                                    South Korea
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+                  
                     <li class="on-hover-item border-right-item border-right-item-sm-space has-submenu arrow-white">
                         <a href="javascript:void(0)" class="selected-text text-white text-sm py-8">USD</a>
                         <ul
@@ -269,17 +216,7 @@
                 <form action="#" class="flex-align flex-wrap form-location-wrapper">
                     <div
                         class="search-category d-flex h-48 select-border-end-0 radius-end-0 search-form d-sm-flex d-none">
-                        <select class="js-example-basic-single border border-gray-200 border-end-0" name="state">
-                            <option value="1" selected disabled>All Categories</option>
-                            <option value="1">Monitors</option>
-                            <option value="1">Consoles</option>
-                            <option value="1">Games</option>
-                            <option value="1">Accessories</option>
-                            <option value="1">PC parts</option>
-                            <option value="1">Pre Owned</option>
-                            <option value="1">Gift Cards</option>
-
-                        </select>
+                       
 
                         <div class="search-form__wrapper position-relative">
                             <input type="text"
@@ -650,43 +587,38 @@
 
                     <!-- Login Form HTML -->
                     <div class="col-xl-6 pe-xl-5">
-                        <div
-                            class="border border-gray-100 hover-border-main-600 transition-1 rounded-16 px-24 py-40 h-100">
+                        <div class="border border-gray-100 hover-border-main-600 transition-1 rounded-16 px-24 py-40 h-100">
                             <h6 class="text-xl mb-32">Login</h6>
                             <form id="loginForm" onsubmit="return false;">
                                 <div class="mb-24">
                                     <label for="email" class="text-neutral-900 text-lg mb-8 fw-medium">
                                         Email address <span class="text-danger">*</span>
                                     </label>
-                                    <input type="email" class="common-input" id="email" placeholder="Enter Email"
-                                        required>
+                                    <input type="email" class="common-input" id="email" placeholder="Enter Email" required>
                                 </div>
                                 <div class="mb-24">
                                     <label for="password" class="text-neutral-900 text-lg mb-8 fw-medium">
                                         Password <span class="text-danger">*</span>
                                     </label>
                                     <div class="position-relative">
-                                        <input type="password" class="common-input" id="password"
-                                            placeholder="Enter Password" required>
-                                        <span
-                                            class="toggle-password position-absolute top-50 inset-inline-end-0 me-16 translate-middle-y cursor-pointer ph ph-eye-slash"></span>
+                                        <input type="password" class="common-input" id="password" placeholder="Enter Password" required>
+                                        <span class="toggle-password position-absolute top-50 inset-inline-end-0 me-16 translate-middle-y cursor-pointer ph ph-eye-slash"></span>
                                     </div>
                                 </div>
                                 <div class="mb-24 mt-48">
                                     <div class="flex-align gap-48 flex-wrap">
-                                        <button onclick="handleLogin()" class="btn btn-main py-18 px-40">Log in</button>
+                                        <button type="button" onclick="handleLogin()" class="btn btn-main py-18 px-40">Log in</button>
                                     </div>
                                 </div>
                             </form>
                             <div class="mt-48">
-                                <a href="forgot.html"
-                                    class="text-danger-600 text-sm fw-semibold hover-text-decoration-underline">
+                                <a href="forgot.html" class="text-danger-600 text-sm fw-semibold hover-text-decoration-underline">
                                     Forgot your password?
                                 </a>
                             </div>
                         </div>
-                    </div>
-
+                    </div> 
+                    
 
                     <!-- <div class="col-xl-6 pe-xl-5">
                         <div

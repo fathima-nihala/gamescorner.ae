@@ -31,16 +31,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (response.ok) {
                 // Registration success
-                alert('Registration successful!');
+                window.alert('Registration successful!');
                 console.log('User registered:', result.user);
                 form.reset();
             } else {
                 // Handle server-side errors
-                alert(result.message || 'Registration failed');
+                window.alert(result.message || 'Registration failed');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred. Please try again later.');
+            window.alert('An error occurred. Please try again later.');
         }
     });
 });
