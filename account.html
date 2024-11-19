@@ -133,7 +133,7 @@
                             </li>
                         </ul>
                     </li>
-                  
+
                     <li class="on-hover-item border-right-item border-right-item-sm-space has-submenu arrow-white">
                         <a href="javascript:void(0)" class="selected-text text-white text-sm py-8">USD</a>
                         <ul
@@ -216,7 +216,7 @@
                 <form action="#" class="flex-align flex-wrap form-location-wrapper">
                     <div
                         class="search-category d-flex h-48 select-border-end-0 radius-end-0 search-form d-sm-flex d-none">
-                       
+
 
                         <div class="search-form__wrapper position-relative">
                             <input type="text"
@@ -587,40 +587,6 @@
 
                     <!-- Login Form HTML -->
                     <div class="col-xl-6 pe-xl-5">
-                        <div class="border border-gray-100 hover-border-main-600 transition-1 rounded-16 px-24 py-40 h-100">
-                            <h6 class="text-xl mb-32">Login</h6>
-                            <form id="loginForm" onsubmit="return false;">
-                                <div class="mb-24">
-                                    <label for="email" class="text-neutral-900 text-lg mb-8 fw-medium">
-                                        Email address <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="email" class="common-input" id="email" placeholder="Enter Email" required>
-                                </div>
-                                <div class="mb-24">
-                                    <label for="password" class="text-neutral-900 text-lg mb-8 fw-medium">
-                                        Password <span class="text-danger">*</span>
-                                    </label>
-                                    <div class="position-relative">
-                                        <input type="password" class="common-input" id="password" placeholder="Enter Password" required>
-                                        <span class="toggle-password position-absolute top-50 inset-inline-end-0 me-16 translate-middle-y cursor-pointer ph ph-eye-slash"></span>
-                                    </div>
-                                </div>
-                                <div class="mb-24 mt-48">
-                                    <div class="flex-align gap-48 flex-wrap">
-                                        <button type="button" onclick="handleLogin()" class="btn btn-main py-18 px-40">Log in</button>
-                                    </div>
-                                </div>
-                            </form>
-                            <div class="mt-48">
-                                <a href="forgot.html" class="text-danger-600 text-sm fw-semibold hover-text-decoration-underline">
-                                    Forgot your password?
-                                </a>
-                            </div>
-                        </div>
-                    </div> 
-                    
-
-                    <!-- <div class="col-xl-6 pe-xl-5">
                         <div
                             class="border border-gray-100 hover-border-main-600 transition-1 rounded-16 px-24 py-40 h-100">
                             <h6 class="text-xl mb-32">Login</h6>
@@ -629,7 +595,8 @@
                                     <label for="email" class="text-neutral-900 text-lg mb-8 fw-medium">
                                         Email address <span class="text-danger">*</span>
                                     </label>
-                                    <input type="email" class="common-input" id="email" placeholder="Enter Email">
+                                    <input type="email" class="common-input" id="email" placeholder="Enter Email"
+                                        required>
                                 </div>
                                 <div class="mb-24">
                                     <label for="password" class="text-neutral-900 text-lg mb-8 fw-medium">
@@ -637,17 +604,25 @@
                                     </label>
                                     <div class="position-relative">
                                         <input type="password" class="common-input" id="password"
-                                            placeholder="Enter Password">
+                                            placeholder="Enter Password" required>
                                         <span
                                             class="toggle-password position-absolute top-50 inset-inline-end-0 me-16 translate-middle-y cursor-pointer ph ph-eye-slash"></span>
                                     </div>
                                 </div>
                                 <div class="mb-24 mt-48">
                                     <div class="flex-align gap-48 flex-wrap">
-                                        <button onclick="handleLogin()" class="btn btn-main py-18 px-40">Log in</button>
+                                        <button type="button" onclick="handleLogin()"
+                                            class="btn btn-main py-18 px-40">Log in</button>
                                     </div>
                                 </div>
                             </form>
+
+                            <!-- Add this section for Google login -->
+                            <div class="mt-24 text-center">
+                                <div class="text-neutral-600 mb-16">Or continue with</div>
+                                <div id="googleBtn" class="google-btn"></div>
+                            </div>
+
                             <div class="mt-48">
                                 <a href="forgot.html"
                                     class="text-danger-600 text-sm fw-semibold hover-text-decoration-underline">
@@ -655,7 +630,8 @@
                                 </a>
                             </div>
                         </div>
-                    </div> -->
+                    </div>
+
                     <!-- Login Card End -->
 
                     <!-- Register Card Start -->

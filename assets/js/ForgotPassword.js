@@ -1,77 +1,64 @@
 document.addEventListener("DOMContentLoaded", function () {
   const apiUrlSendOtp = "http://localhost:5000/api/web_forgot";
-  const apiUrlVerifyOtp = "http://localhost:5000/api/web_verify ";
+  const apiUrlVerifyOtp = "http://localhost:5000/api/web_verify";
 
   // Function to send OTP
   async function sendOtp(email) {
-    try {
-      const response = await fetch(apiUrlSendOtp, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Error: ${errorText}`);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error sending OTP:", error);
-      throw new Error("An error occurred while sending OTP. Please try again.");
-    }
+    const response = await fetch(apiUrlSendOtp, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    if (!response.ok) throw new Error(await response.text());
+    return await response.json();
   }
 
+  // Function to verify OTP
   async function verifyOtp(email, otp) {
-    try {
-      const response = await fetch(apiUrlVerifyOtp, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, resetPasswordOTP: otp }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Error: ${errorText}`);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error verifying OTP:", error);
-      throw new Error(
-        "An error occurred during OTP verification. Please try again."
-      );
-    }
+    const response = await fetch(apiUrlVerifyOtp, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, otp }),
+    });
+    if (!response.ok) throw new Error(await response.text());
+    return await response.json();
   }
 
-  // Handle forgot password form submission
+  // Handle Forgot Password Page
   const forgotPasswordForm = document.getElementById("forgotPasswordForm");
   if (forgotPasswordForm) {
-    forgotPasswordForm.addEventListener("submit", async function (e) {
+    forgotPasswordForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const email = document.getElementById("email").value;
+      const emailElement = document.getElementById("email");
       const submitButton = document.getElementById("submitButton");
+      const statusMessage = document.getElementById("statusMessage");
+
+      if (!emailElement || !submitButton || !statusMessage) {
+        console.error("Required elements are missing on the Forgot Password page.");
+        return;
+      }
+
+      const email = emailElement.value.trim();
+      if (!email) {
+        statusMessage.innerText = "Please enter a valid email address.";
+        return;
+      }
 
       submitButton.disabled = true;
-      submitButton.innerText = "OTP Sending...";
+      submitButton.innerText = "Sending OTP...";
 
       try {
         const data = await sendOtp(email);
-        document.getElementById("statusMessage").innerText = data.message;
+        statusMessage.innerText = data.message;
 
         if (data.success) {
+          // Store email in localStorage to pass it to the next page
+          localStorage.setItem("email", email);
           window.location.href = "verify-otp.html";
         }
       } catch (error) {
-        document.getElementById("statusMessage").innerText = error.message;
+        statusMessage.innerText = error.message || "Failed to send OTP.";
       } finally {
         submitButton.disabled = false;
         submitButton.innerText = "Send OTP";
@@ -79,30 +66,51 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Handle OTP verification button click
+  // Handle OTP Verification Page
   const verifyOtpButton = document.getElementById("verifyOtpButton");
   if (verifyOtpButton) {
-    verifyOtpButton.addEventListener("click", async function () {
-      const otp = document.getElementById("otp").value;
-      const email = document.getElementById("email").value;
-      const verifyButton = document.getElementById("verifyOtpButton");
+    const emailElement = document.getElementById("email");
+    const otpElement = document.getElementById("otp");
+    const otpStatusMessage = document.getElementById("otpStatusMessage");
 
-      verifyButton.disabled = true;
-      verifyButton.innerText = "Verifying...";
+    // Pre-fill the email field with the value from localStorage
+    const storedEmail = localStorage.getItem("email");
+    if (emailElement && storedEmail) {
+      emailElement.value = storedEmail;
+    }
+
+    verifyOtpButton.addEventListener("click", async () => {
+      if (!emailElement || !otpElement || !otpStatusMessage) {
+        console.error("Required elements are missing on the OTP Verification page.");
+        return;
+      }
+
+      const email = emailElement.value.trim();
+      const otp = otpElement.value.trim();
+
+      if (!email || !otp) {
+        otpStatusMessage.innerText = "Both email and OTP are required.";
+        return;
+      }
+
+      verifyOtpButton.disabled = true;
+      verifyOtpButton.innerText = "Verifying...";
 
       try {
         const data = await verifyOtp(email, otp);
-        document.getElementById("otpStatusMessage").innerText = data.message;
+        otpStatusMessage.innerText = data.message;
 
         if (data.success) {
           alert("OTP verified successfully!");
+          // Clear localStorage after verification
+          localStorage.removeItem("email");
           window.location.href = "reset-password.html";
         }
       } catch (error) {
-        document.getElementById("otpStatusMessage").innerText = error.message;
+        otpStatusMessage.innerText = error.message || "Failed to verify OTP.";
       } finally {
-        verifyButton.disabled = false;
-        verifyButton.innerText = "Verify OTP";
+        verifyOtpButton.disabled = false;
+        verifyOtpButton.innerText = "Verify OTP";
       }
     });
   }
