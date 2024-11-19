@@ -26,7 +26,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Function to verify OTP
   async function verifyOtp(email, otp) {
     try {
       const response = await fetch(apiUrlVerifyOtp, {
@@ -53,18 +52,16 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Handle forgot password form submission
-  document
-    .getElementById("forgotPasswordForm")
-    .addEventListener("submit", async function (e) {
+  const forgotPasswordForm = document.getElementById("forgotPasswordForm");
+  if (forgotPasswordForm) {
+    forgotPasswordForm.addEventListener("submit", async function (e) {
       e.preventDefault();
 
       const email = document.getElementById("email").value;
       const submitButton = document.getElementById("submitButton");
 
-      // Disable the button and change its text to "OTP Sending..."
       submitButton.disabled = true;
       submitButton.innerText = "OTP Sending...";
-
 
       try {
         const data = await sendOtp(email);
@@ -75,17 +72,17 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       } catch (error) {
         document.getElementById("statusMessage").innerText = error.message;
-      }
-      finally {
+      } finally {
         submitButton.disabled = false;
         submitButton.innerText = "Send OTP";
       }
     });
+  }
 
   // Handle OTP verification button click
-  document
-    .getElementById("verifyOtpButton")
-    .addEventListener("click", async function () {
+  const verifyOtpButton = document.getElementById("verifyOtpButton");
+  if (verifyOtpButton) {
+    verifyOtpButton.addEventListener("click", async function () {
       const otp = document.getElementById("otp").value;
       const email = document.getElementById("email").value;
       const verifyButton = document.getElementById("verifyOtpButton");
@@ -103,10 +100,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       } catch (error) {
         document.getElementById("otpStatusMessage").innerText = error.message;
-      }
-      finally {
+      } finally {
         verifyButton.disabled = false;
         verifyButton.innerText = "Verify OTP";
       }
     });
+  }
 });
