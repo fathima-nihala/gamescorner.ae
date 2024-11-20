@@ -14,11 +14,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Function to verify OTP
-  async function verifyOtp(email, otp) {
+  async function verifyOtp(email, resetPasswordOTP ) {
     const response = await fetch(apiUrlVerifyOtp, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, otp }),
+      body: JSON.stringify({ email, resetPasswordOTP  }),
     });
     if (!response.ok) throw new Error(await response.text());
     return await response.json();
@@ -86,9 +86,9 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       const email = emailElement.value.trim();
-      const otp = otpElement.value.trim();
+      const resetPasswordOTP  = otpElement.value.trim();
 
-      if (!email || !otp) {
+      if (!email || !resetPasswordOTP ) {
         otpStatusMessage.innerText = "Both email and OTP are required.";
         return;
       }
@@ -97,7 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
       verifyOtpButton.innerText = "Verifying...";
 
       try {
-        const data = await verifyOtp(email, otp);
+        const data = await verifyOtp(email, resetPasswordOTP );
         otpStatusMessage.innerText = data.message;
 
         if (data.success) {
