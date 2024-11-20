@@ -7,6 +7,13 @@ const authConfig = {
 
 // Initialize Google Sign-In
 function initializeGoogleAuth() {
+
+    if (typeof google === 'undefined') {
+        console.log('Waiting for Google API to load...');
+        setTimeout(initializeGoogleAuth, 100);
+        return;
+    }
+
     try {
         google.accounts.id.initialize({
             client_id: authConfig.clientId,
@@ -46,7 +53,7 @@ async function handleGoogleResponse(response) {
             const data = await result.json();
 
             if (data.status) {
-                localStorage.setItem('token', data.webtoken);
+                localStorage.setItem('webtoken', data.webtoken);
                 localStorage.setItem('user', JSON.stringify({
                     email: data.result.email,
                     name: data.result.name,
@@ -78,32 +85,7 @@ function showError(message) {
     }
 }
 
-// Regular login handler
-async function handleLogin() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    // Implement your regular login logic here
-}
-
-// Password toggle functionality
-function initializePasswordToggle() {
-    const toggleButton = document.querySelector('.toggle-password');
-    const passwordInput = document.getElementById('password');
-    
-    if (toggleButton && passwordInput) {
-        toggleButton.addEventListener('click', function() {
-            const type = passwordInput.type === 'password' ? 'text' : 'password';
-            passwordInput.type = type;
-            
-            // Toggle icon
-            this.classList.toggle('ph-eye-slash');
-            this.classList.toggle('ph-eye');
-        });
-    }
-}
-
 // Initialize everything when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    initializePasswordToggle();
     initializeGoogleAuth();
 });
