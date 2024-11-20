@@ -1377,7 +1377,7 @@ input[type=number] {
 /* Location Box Css  */
 .location-box .select2-container .select2-selection--single .select2-selection__rendered {
     padding-inline-start: 0px !important;
-    padding-inline-end: 50px !important;
+    padding-inline-end: 59px !important;  
 }
 
 .location-box .select2-selection__arrow {
@@ -4162,6 +4162,7 @@ input:focus-visible {
 @media (min-width: 424px) {
     .d-xs-flex {
         display: flex !important;
+       
     }
 }
 
