@@ -1,35 +1,39 @@
-class GoogleAuth {
-    constructor(clientId, onLoginSuccess) {
-        this.clientId = clientId;
-        this.onLoginSuccess = onLoginSuccess;
-    }
 
-    initialize() {
+const authConfig = {
+    clientId: '98946538407-4k5pr38hpks6rkoiqjklarsrprsf8rhc.apps.googleusercontent.com',
+    apiEndpoint: 'http://localhost:5000/api/google_login',
+    redirectPath: '/index.html'
+};
+
+// Initialize Google Sign-In
+function initializeGoogleAuth() {
+    try {
         google.accounts.id.initialize({
-            client_id: this.clientId,
-            callback: this.handleGoogleSignIn.bind(this)
+            client_id: authConfig.clientId,
+            callback: handleGoogleResponse,
+            auto_select: false,
+            cancel_on_tap_outside: true
         });
-        this.renderButton();
-    }
 
-    renderButton() {
-        const buttonElement = document.getElementById("googleBtn");
-        if (buttonElement) {
-            google.accounts.id.renderButton(
-                buttonElement,
-                { 
-                    theme: "filled_blue", 
-                    size: "large",
-                    width: 280,
-                    text: "continue_with"
-                }
-            );
-        }
+        google.accounts.id.renderButton(
+            document.getElementById("googleBtn"),
+            {
+                theme: "outline",
+                size: "large",
+                width: 280,
+                type: "standard"
+            }
+        );
+    } catch (error) {
+        console.error('Error initializing Google Auth:', error);
     }
+}
 
-    async handleGoogleSignIn(response) {
+// Handle the response from Google
+async function handleGoogleResponse(response) {
+    if (response.credential) {
         try {
-            const result = await fetch('http://localhost:5000/api/google_login', {
+            const result = await fetch(authConfig.apiEndpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -42,20 +46,64 @@ class GoogleAuth {
             const data = await result.json();
 
             if (data.status) {
-                localStorage.setItem('token', data.access_token);
-                localStorage.setItem('user', JSON.stringify(data.result));
-                
-                if (this.onLoginSuccess) {
-                    this.onLoginSuccess(data);
-                } else {
-                    window.location.href = 'index.html';
-                }
+                localStorage.setItem('token', data.webtoken);
+                localStorage.setItem('user', JSON.stringify({
+                    email: data.result.email,
+                    name: data.result.name,
+                    picture: data.result.picture
+                }));
+
+                window.location.href = authConfig.redirectPath;
             } else {
-                alert('Login failed: ' + data.message);
+                showError('Login failed: ' + data.message);
             }
         } catch (error) {
-            console.error('Google sign-in error:', error);
-            alert('Login failed. Please try again.');
+            console.error('Login error:', error);
+            showError('Login failed. Please try again.');
         }
     }
 }
+
+// Show error message
+function showError(message) {
+    const errorDiv = document.getElementById('errorMessage');
+    if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        setTimeout(() => {
+            errorDiv.style.display = 'none';
+        }, 5000);
+    } else {
+        alert(message);
+    }
+}
+
+// Regular login handler
+async function handleLogin() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    // Implement your regular login logic here
+}
+
+// Password toggle functionality
+function initializePasswordToggle() {
+    const toggleButton = document.querySelector('.toggle-password');
+    const passwordInput = document.getElementById('password');
+    
+    if (toggleButton && passwordInput) {
+        toggleButton.addEventListener('click', function() {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            
+            // Toggle icon
+            this.classList.toggle('ph-eye-slash');
+            this.classList.toggle('ph-eye');
+        });
+    }
+}
+
+// Initialize everything when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    initializePasswordToggle();
+    initializeGoogleAuth();
+});

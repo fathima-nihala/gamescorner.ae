@@ -20,6 +20,9 @@
     <link rel="stylesheet" href="assets/css/jquery-ui.css">
     <!-- Main css -->
     <link rel="stylesheet" href="assets/css/main.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <meta name="google-signin-client_id" content="98946538407-4k5pr38hpks6rkoiqjklarsrprsf8rhc.apps.googleusercontent.com">
+
 </head>
 
 <body>
@@ -556,8 +559,8 @@
 
                             <!-- Add this section for Google login -->
                             <div class="mt-24 text-center">
-                                <div class="text-neutral-600 mb-16">Or continue with</div>
-                                <div id="googleBtn" class="google-btn"></div>
+                                <div id="googleBtn"></div>
+                                <div id="errorMessage" class="text-danger mt-2" style="display: none;"></div>
                             </div>
 
                             <div class="mt-48">
@@ -905,6 +908,8 @@
     <script src="assets/js/login.js"></script>
     <!-- register -->
     <script src="assets/js/register.js"></script>
+    <!-- Google auth -->
+     <script src="assets/js/GoogleAuth.js"></script>
 
 
 
