@@ -7,9 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitButton = document.getElementById('submitButton');
 
     // Get email and OTP from URL parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    const email = urlParams.get('email');
-    const resetPasswordOTP = urlParams.get('otp');
+    // const urlParams = new URLSearchParams(window.location.search);
+    const email = localStorage.getItem('email');
+    const resetPasswordOTP = localStorage.getItem('resetPasswordOTP');
 
     if (!email || !resetPasswordOTP) {
         errorMessage.textContent = 'Invalid reset password link';
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const passwordValue = password.value;
         const confirmPasswordValue = confirmPassword.value;
 
-        if (passwordValue.length < 8) {
+        if (passwordValue.length < 6) {
             errorMessage.textContent = 'Password must be at least 8 characters long';
             submitButton.disabled = true;
             return false;

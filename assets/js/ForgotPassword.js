@@ -103,7 +103,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (data.success) {
           alert("OTP verified successfully!");
           // Clear localStorage after verification
-          localStorage.removeItem("email");
+          // localStorage.removeItem("email");
+          localStorage.setItem("resetPasswordOTP", resetPasswordOTP)
           window.location.href = "reset-password.html";
         }
       } catch (error) {
