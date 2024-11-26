@@ -134,8 +134,8 @@
                             </li>
                         </ul>
                     </li>
-                   
-                   
+
+
                     <li class="border-right-item account">
                         <a href="account.html" class="text-white text-sm py-8 flex-align gap-6">
                             <span class="icon text-md d-flex"> <i class="ph ph-user-circle"></i> </span>
@@ -176,7 +176,7 @@
                     </div>
 
                     <div class="location-box bg-white flex-align gap-8 py-6 px-16 rounded-pill border border-gray-100">
-                        <span class="text-gray-900 text-xl d-xs-flex d-none" ><i class="ph ph-map-pin"></i></span>
+                        <span class="text-gray-900 text-xl d-xs-flex d-none"><i class="ph ph-map-pin"></i></span>
                         <div class="line-height-1">
                             <span class="text-gray-600 text-xs">Your Location</span>
                             <div class="line-height-1">
@@ -521,30 +521,25 @@
     <section class="shop py-80">
         <div class="container container-lg">
             <div class="row">
-
-                <!-- Sidebar Start -->
                 <div class="col-lg-3">
                     <div class="shop-sidebar">
                         <button type="button"
                             class="shop-sidebar__close d-lg-none d-flex w-32 h-32 flex-center border border-gray-100 rounded-circle hover-bg-main-600 position-absolute inset-inline-end-0 me-10 mt-8 hover-text-white hover-border-main-600">
                             <i class="ph ph-x"></i>
                         </button>
-                        
-                        <!-- sub category -->
+
                         <div class="shop-sidebar__box border border-gray-100 rounded-8 p-32 mb-32">
                             <h6 class="text-xl border-bottom border-gray-100 pb-24 mb-24">Product Sub Category</h6>
                             <ul class="max-h-540 overflow-y-auto scroll-sm" id="categoryList">
                             </ul>
                         </div>
-                        
-                      <!-- parent category -->
+
                         <div class="shop-sidebar__box border border-gray-100 rounded-8 p-32 mb-32">
                             <h6 class="text-xl border-bottom border-gray-100 pb-24 mb-24">Filter by Category</h6>
                             <ul class="max-h-540 overflow-y-auto scroll-sm" id="parentcat_list">
                             </ul>
                         </div>
 
-                        <!-- brand -->
                         <div class="shop-sidebar__box border border-gray-100 rounded-8 p-32 mb-32">
                             <h6 class="text-xl border-bottom border-gray-100 pb-24 mb-24">Filter by Brand</h6>
                             <ul class="max-h-540 overflow-y-auto scroll-sm" id="brandList">
@@ -556,11 +551,8 @@
                         </div>
                     </div>
                 </div>
-                <!-- Sidebar End -->
 
-                <!-- Content Start -->
                 <div class="col-lg-9">
-                    <!-- Top Start -->
                     <div class="flex-between gap-16 flex-wrap mb-40 ">
                         <span class="text-gray-900">Showing 1-20 of 85 result</span>
                         <div class="position-relative flex-align gap-16 flex-wrap">
@@ -588,40 +580,16 @@
                                     class="ph-bold ph-funnel"></i></button>
                         </div>
                     </div>
-                    <!-- Top End -->
 
-                    <div class="list-grid-wrapper">
+                    <div class="list-grid-wrapper"  id="productGrid">
                         <div
                             class="product-card h-100 p-16 border border-gray-100 hover-border-main-600 rounded-16 position-relative transition-2">
-                            <a href="product-details.html"
-                                class="product-card__thumb flex-center rounded-8 bg-gray-50 position-relative">
-                                <img src="assets/images/thumbs/product-two-img1.png" alt="" class="w-auto max-w-unset">
-                                <span
-                                    class="product-card__badge bg-primary-600 px-8 py-4 text-sm text-white position-absolute inset-inline-start-0 inset-block-start-0">Best
-                                    Sale </span>
-                            </a>
-                            <div class="product-card__content mt-10">
-                                <h6 class="title text-lg fw-semibold mt-12 mb-8">
-                                    <a href="product-details.html" class="link text-line-2" tabindex="0">Lorem ipsum
-                                        dolor sit amet, consectetur adipiscing elit. </a>
-                                </h6>
-                                <div class="product-card__price my-20">
-                                    <span class="text-gray-400 text-md fw-semibold text-decoration-line-through">
-                                        $28.99</span>
-                                    <span class="text-heading text-md fw-semibold ">$14.99 <span
-                                            class="text-gray-500 fw-normal">/Qty</span> </span>
-                                </div>
-                                <a href="cart.html"
-                                    class="product-card__cart btn bg-gray-50 text-heading hover-bg-main-600 hover-text-white py-11 px-24 rounded-8 flex-center gap-8 fw-medium"
-                                    tabindex="0">
-                                    Add To Cart <i class="ph ph-shopping-cart"></i>
-                                </a>
+                          
                             </div>
                         </div>
-                       
+
                     </div>
 
-                    <!-- Pagination Start -->
                     <ul class="pagination flex-center flex-wrap gap-16">
                         <li class="page-item">
                             <a class="page-link h-64 w-64 flex-center text-xxl rounded-8 fw-medium text-neutral-600 border border-gray-100"
@@ -664,9 +632,7 @@
                             </a>
                         </li>
                     </ul>
-                    <!-- Pagination End -->
                 </div>
-                <!-- Content End -->
 
             </div>
         </div>
@@ -955,7 +921,7 @@
     <!-- main js -->
     <script src="assets/js/main.js"></script>
     <!-- sub category -->
-     <script src="assets/js/shop.js"></script>
+    <script src="assets/js/shop.js"></script>
 
 
 
