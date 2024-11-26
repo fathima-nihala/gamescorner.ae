@@ -184,6 +184,7 @@ class ProductListing {
                 const sortedProducts = this.sortProducts(data.products, sortFilter?.value);
                 this.renderProducts(sortedProducts);
                 this.renderPagination();
+                this.renderResultsCount(); 
             }
         } catch (error) {
             console.error('Error fetching products:', error);
@@ -251,6 +252,16 @@ class ProductListing {
             </div>
             </div>
         `;
+    }
+
+    renderResultsCount() {
+        const resultsCount = document.getElementById('resultsCount');
+        if (!resultsCount) return;
+    
+        const start = (this.currentPage - 1) * this.productsPerPage + 1;
+        const end = Math.min(this.currentPage * this.productsPerPage, this.totalProducts);
+    
+        resultsCount.textContent = `Showing ${start}-${end} of ${this.totalProducts} results`;
     }
 
     renderPagination() {
