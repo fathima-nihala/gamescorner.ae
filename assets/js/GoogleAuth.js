@@ -1,7 +1,7 @@
 
 const authConfig = {
     clientId: '98946538407-4k5pr38hpks6rkoiqjklarsrprsf8rhc.apps.googleusercontent.com',
-    apiEndpoint: 'http://localhost:5000/api/google_login',
+    apiEndpoint: 'http://localhost:5002/api/google_login',
     redirectPath: '/index.html'
 };
 

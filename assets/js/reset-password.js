@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.disabled = true;
             submitButton.textContent = 'Resetting...';
 
-            const response = await fetch('http://localhost:5000/api/web_reset', {
+            const response = await fetch('http://localhost:5002/api/web_reset', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

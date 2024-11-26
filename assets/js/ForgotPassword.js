@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const apiUrlSendOtp = "http://localhost:5000/api/web_forgot";
-  const apiUrlVerifyOtp = "http://localhost:5000/api/web_verify";
+  const apiUrlSendOtp = "http://localhost:5002/api/web_forgot";
+  const apiUrlVerifyOtp = "http://localhost:5002/api/web_verify";
 
   // Function to send OTP
   async function sendOtp(email) {

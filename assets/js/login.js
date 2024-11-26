@@ -27,7 +27,7 @@ async function handleLogin() {
 
     try {
         // Send login request
-        const response = await fetch('http://localhost:5000/api/weblogin', {
+        const response = await fetch('http://localhost:5002/api/weblogin', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

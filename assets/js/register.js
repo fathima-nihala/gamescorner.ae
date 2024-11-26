@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
         formData.append("password", password);
 
         try {
-            const response = await fetch('http://localhost:5000/api/web_reg', {
+            const response = await fetch('http://localhost:5002/api/web_reg', {
                 method: 'POST',
                 body: formData,
             });
