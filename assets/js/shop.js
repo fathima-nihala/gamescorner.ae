@@ -26,9 +26,6 @@ class ProductListing {
     initEventListeners() {
         // Sort filter listener
         const sortFilter = document.getElementById('sortFilter');
-        // if (sortFilter) {
-        //     sortFilter.addEventListener('change', () => this.fetchProducts());
-        // }
 
         if (sortFilter) {
             sortFilter.addEventListener('change', () => {
@@ -195,13 +192,10 @@ class ProductListing {
             url.search = params.toString();
             const response = await fetch(url);
             const data = await response.json();
-            console.log(data, 'this');
 
             if (data.success) {
                 this.allProducts = data.products;
-                this.totalProducts = this.allProducts.count || this.allProducts.length;;
-                // const sortedProducts = this.sortProducts(data.products, sortFilter?.value);
-                // this.renderProducts(sortedProducts);
+                this.totalProducts = this.allProducts.count || this.allProducts.length;
                 this.renderProducts(this.getPaginatedProducts());
                 this.renderPagination();
                 this.renderResultsCount();
@@ -269,10 +263,12 @@ class ProductListing {
         const aedPricing = product.country_pricing.find(pricing => pricing.currency_code === 'AED');
         const price = aedPricing?.unit_price || 'N/A';
         const discount = aedPricing?.discount || 'N/A';
+        const currencyCode = aedPricing ? aedPricing.currency_code : 'N/A';
+        
 
         return `
             <div class="product-card h-100 p-4 border border-gray-200 rounded-lg hover:border-blue-600 transition-all">
-                 <a href="product-details.html" class="product-card__thumb flex-center rounded-8 bg-gray-50 position-relative">
+                 <a href="product-details.html?id${product._id}" class="product-card__thumb flex-center rounded-8 bg-gray-50 position-relative">
                 <img src="${imageUrl}" alt="${product.name}" class="w-auto ">
                 ${product.todaysDeal ?
                 '<span class="product-card__badge bg-primary-600 px-8 py-4 text-sm text-white position-absolute inset-inline-start-0 inset-block-start-0">Today\'s Deal</span>' :
@@ -287,11 +283,9 @@ class ProductListing {
                       <span class="text-heading text-md fw-semibold ">AED ${discount}<span
                       class="text-gray-500 fw-normal"></span> </span>
                  </div>
-                 <div
-                   class="product-card__cart btn bg-gray-50 text-heading hover-bg-main-600 hover-text-white py-11 px-24 rounded-8 flex-center gap-8 fw-medium"
-                    tabindex="0">
-                     Add To Cart <i class="ph ph-shopping-cart"></i>
-                     </div>
+                  <a href="cart.html" class="product-card__cart btn bg-gray-50 text-heading hover-bg-main-600 hover-text-white py-11 px-24 rounded-8 flex-center gap-8 fw-medium" tabindex="0" data-product-id="${product._id}" data-product-price="${price}" data-product-discount="${discount}" data-product-currencycode="${currencyCode}" data-product-quantity="1" onClick="handleAddToCart">
+                        Add To Cart <i class="ph ph-shopping-cart"></i>
+                    </a>
                 </div>
             </div>
                 
@@ -375,3 +369,50 @@ let productListing;
 document.addEventListener('DOMContentLoaded', () => {
     productListing = new ProductListing();
 });
+
+
+// This is your existing method where you are handling the "Add to Cart" button click.
+function handleAddToCart(event) {
+    event.preventDefault();
+    
+    const button = event.target.closest('a'); // Get the closest link (Add to Cart button)
+    const productId = button.dataset.productId; // Get the product ID
+    const productPrice = button.dataset.productPrice; // Get the product price
+    const productDiscount = button.dataset.productDiscount; // Get the product discount
+    const productCurrency = button.dataset.productCurrencycode; // Get the product currency
+    const quantity = button.dataset.productQuantity; // Get the quantity (default 1)
+
+    const cartItem = {
+        productId,
+        price: productPrice,
+        discount: productDiscount,
+        currency: productCurrency,
+        quantity
+    };
+
+    addToCart(cartItem);
+}
+
+// Function to add product to the cart via API
+async function addToCart(cartItem) {
+    try {
+        const response = await fetch('http://localhost:5002/api/web_cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(cartItem),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('Product added to cart!');
+        } else {
+            alert('Failed to add product to cart');
+        }
+    } catch (error) {
+        console.error('Error adding product to cart:', error);
+        alert('There was an error adding the product to the cart');
+    }
+}
