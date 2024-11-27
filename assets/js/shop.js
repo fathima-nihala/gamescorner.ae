@@ -176,15 +176,15 @@ class ProductListing {
             const response = await fetch(url);
             const data = await response.json();
 
-            console.log(data,'this');
-            
+            console.log(data, 'this');
+
 
             if (data.success) {
                 this.totalProducts = data.count || data.products.length;
                 const sortedProducts = this.sortProducts(data.products, sortFilter?.value);
                 this.renderProducts(sortedProducts);
                 this.renderPagination();
-                this.renderResultsCount(); 
+                this.renderResultsCount();
             }
         } catch (error) {
             console.error('Error fetching products:', error);
@@ -227,7 +227,9 @@ class ProductListing {
 
     createProductCard(product) {
         const imageUrl = product.image || '/placeholder.jpg';
-        const price = product.country_pricing?.[0]?.price || 'N/A';
+        const aedPricing = product.country_pricing.find(pricing => pricing.currency_code === 'AED');
+        const price = aedPricing?.unit_price || 'N/A';
+        const discount = aedPricing?.discount || 'N/A';
 
         return `
             <div class="product-card h-100 p-4 border border-gray-200 rounded-lg hover:border-blue-600 transition-all">
@@ -236,31 +238,34 @@ class ProductListing {
                 ${product.todaysDeal ?
                 '<span class="product-card__badge bg-primary-600 px-8 py-4 text-sm text-white position-absolute inset-inline-start-0 inset-block-start-0">Today\'s Deal</span>' :
                 ''}
-            </a>
-            <div class="product-card__content mt-10">
+                 </a>
+                 <div class="product-card__content mt-16">
                 <h6 class="title text-lg fw-semibold mt-12 mb-8">
                     <a href="product-details.html" class="link text-line-2">${product.name}</a>
                 </h6>
                 <div class="product-card__price my-20">
-                      <span class="text-gray-400 text-md fw-semibold text-decoration-line-through">${product.price}</span>
-                      <span class="text-heading text-md fw-semibold ">${product.discount}<span
-                      class="text-gray-500 fw-normal">/Qty</span> </span>
-                  </div>
-                <a href="cart.html" class="product-card__cart btn bg-gray-50 text-heading hover-bg-main-600 hover-text-white py-11 px-24 rounded-8 flex-center gap-8 fw-medium">
-                    Add To Cart <i class="ph ph-shopping-cart"></i>
-                </a>
+                      <span class="text-gray-400 text-md fw-semibold text-decoration-line-through">AED ${price}</span>
+                      <span class="text-heading text-md fw-semibold ">AED ${discount}<span
+                      class="text-gray-500 fw-normal"></span> </span>
+                 </div>
+                 <div
+                   class="product-card__cart btn bg-gray-50 text-heading hover-bg-main-600 hover-text-white py-11 px-24 rounded-8 flex-center gap-8 fw-medium"
+                    tabindex="0">
+                     Add To Cart <i class="ph ph-shopping-cart"></i>
+                     </div>
+                </div>
             </div>
-            </div>
+                
         `;
     }
 
     renderResultsCount() {
         const resultsCount = document.getElementById('resultsCount');
         if (!resultsCount) return;
-    
+
         const start = (this.currentPage - 1) * this.productsPerPage + 1;
         const end = Math.min(this.currentPage * this.productsPerPage, this.totalProducts);
-    
+
         resultsCount.textContent = `Showing ${start}-${end} of ${this.totalProducts} results`;
     }
 
