@@ -2,7 +2,8 @@ class ProductListing {
     constructor() {
         this.baseUrl = 'http://localhost:5002/api/productweb';
         this.currentPage = 1;
-        this.productsPerPage = 1;
+        this.productsPerPage = 20;
+        this.allProducts = [];
         this.totalProducts = 0;
         this.selectedFilters = {
             parentCategory: '',
@@ -197,9 +198,11 @@ class ProductListing {
             console.log(data, 'this');
 
             if (data.success) {
-                this.totalProducts = data.count || data.products.length;
-                const sortedProducts = this.sortProducts(data.products, sortFilter?.value);
-                this.renderProducts(sortedProducts);
+                this.allProducts = data.products;
+                this.totalProducts = this.allProducts.count || this.allProducts.length;;
+                // const sortedProducts = this.sortProducts(data.products, sortFilter?.value);
+                // this.renderProducts(sortedProducts);
+                this.renderProducts(this.getPaginatedProducts());
                 this.renderPagination();
                 this.renderResultsCount();
             }
@@ -305,6 +308,12 @@ class ProductListing {
         resultsCount.textContent = `Showing ${start}-${end} of ${this.totalProducts} results`;
     }
 
+    getPaginatedProducts() {
+        const startIndex = (this.currentPage - 1) * this.productsPerPage;
+        const endIndex = startIndex + this.productsPerPage;
+        return this.allProducts.slice(startIndex, endIndex);
+    }
+
     renderPagination() {
         const pagination = document.getElementById('pagination');
         if (!pagination) return;
@@ -315,7 +324,7 @@ class ProductListing {
         // Previous button
         paginationHTML += `
             <li class="page-item ${this.currentPage === 1 ? 'opacity-50 pointer-events-none' : ''}">
-                <button class="page-link h-64 w-64 flex-center text-xxl rounded-8 fw-medium text-neutral-600 border border-gray-100" onclick="productListing.changePage(${this.currentPage - 1})">
+                 <button class="page-link h-64 w-64 flex-center text-xxl rounded-8 fw-medium text-neutral-600 border border-gray-100" onclick="productListing.changePage(${this.currentPage - 1})">
                  <i class="ph-bold ph-arrow-left"></i>
                 </button>
             </li>
@@ -324,15 +333,15 @@ class ProductListing {
         // Page numbers
         for (let i = 1; i <= totalPages; i++) {
             paginationHTML += `
-            <li class="page-item">
-             <a class="page-link h-64 w-64 flex-center text-md rounded-8 fw-medium text-neutral-600 border border-gray-100 ${this.currentPage === i ? 'bg-blue-600 text-white' : ''}" onclick="productListing.changePage(${i})" href="#">${i}</a>
-            </li>
+                <li class="page-item ${this.currentPage === i ? 'active' : ''}">
+                    <button class="page-link h-64 w-64 flex-center text-md rounded-8 fw-medium text-neutral-600 border border-gray-100" onclick="productListing.changePage(${i})">${i}</button>
+                </li>
             `;
         }
 
         // Next button
         paginationHTML += `
-            <li class="page-item ${this.currentPage === totalPages ? 'opacity-50 pointer-events-none' : ''}">
+             <li class="page-item ${this.currentPage === totalPages ? 'opacity-50 pointer-events-none' : ''}">
                 <button class="page-link h-64 w-64 flex-center text-xxl rounded-8 fw-medium text-neutral-600 border border-gray-100" onclick="productListing.changePage(${this.currentPage + 1})">
                     <i class="ph-bold ph-arrow-right"></i>
                 </button>
@@ -344,7 +353,9 @@ class ProductListing {
 
     changePage(page) {
         this.currentPage = page;
-        this.fetchProducts();
+        this.renderProducts(this.getPaginatedProducts());
+        this.renderPagination();
+        this.renderResultsCount();
     }
 
     showError(containerId) {
