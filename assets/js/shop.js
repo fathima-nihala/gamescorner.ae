@@ -283,7 +283,7 @@ class ProductListing {
                       <span class="text-heading text-md fw-semibold ">AED ${discount}<span
                       class="text-gray-500 fw-normal"></span> </span>
                  </div>
-                  <a href="cart.html" class="product-card__cart btn bg-gray-50 text-heading hover-bg-main-600 hover-text-white py-11 px-24 rounded-8 flex-center gap-8 fw-medium" tabindex="0" data-product-id="${product._id}" data-product-price="${price}" data-product-discount="${discount}" data-product-currencycode="${currencyCode}" data-product-quantity="1" onClick="handleAddToCart">
+                  <a href="" class="product-card__cart btn bg-gray-50 text-heading hover-bg-main-600 hover-text-white py-11 px-24 rounded-8 flex-center gap-8 fw-medium" tabindex="0" data-product-id="${product._id}" data-product-price="${price}" data-product-discount="${discount}" data-product-currencycode="${currencyCode}" data-product-quantity="1" onClick="handleAddToCart">
                         Add To Cart <i class="ph ph-shopping-cart"></i>
                     </a>
                 </div>
@@ -370,40 +370,58 @@ document.addEventListener('DOMContentLoaded', () => {
     productListing = new ProductListing();
 });
 
-function handleAddToCart(event) {
-    event.preventDefault(); // Prevent the default behavior (navigation)
 
-    const button = event.target.closest('button'); // Get the closest button clicked
+function handleAddToCart(event) {
+    event.preventDefault(); 
+
+    const webtoken = localStorage.getItem('webtoken');
+    if (!webtoken) {
+        alert('Logging first to handle this');
+        window.location.href = "account.html";  
+        return;
+    }
+
+    const button = event.target.closest('a'); 
     const productId = button.getAttribute('data-product-id');
     const productPrice = button.getAttribute('data-product-price');
     const productDiscount = button.getAttribute('data-product-discount');
     const productCurrencyCode = button.getAttribute('data-product-currencycode');
-    const productQuantity = button.getAttribute('data-product-quantity');
+    const productQuantity = button.getAttribute('data-product-quantity') || 1;
 
     const productData = {
         productId: productId,
-        productCurrencyCode: productCurrencyCode,
-        productQuantity: parseInt(productQuantity),
-        productPrice: parseFloat(productPrice),
-        productDiscount: parseFloat(productDiscount)
+        product_currecy_code: productCurrencyCode, 
+        product_quantity: parseInt(productQuantity),
+        product_price: parseFloat(productPrice),
+        product_discount: parseFloat(productDiscount)
     };
 
-    // Send a POST request to your backend API to save the product in the cart
     fetch('http://localhost:5002/api/web_cart', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${webtoken}` 
         },
-        body: JSON.stringify(productData), // Send product data as JSON
+        body: JSON.stringify(productData),
     })
-    .then(response => response.json())  // Parse the response as JSON
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         console.log('Product added to cart:', data);
         alert('Product added to cart!');
-        window.location.href = 'cart.html'; // Redirect to cart page (optional)
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('There was an error adding the product to the cart.');
+        alert('Error occurred while adding the product to the cart.');
     });
 }
+
+document.addEventListener('click', (e) => {
+    if (e.target.closest('[onClick="handleAddToCart"]')) {
+        handleAddToCart(e);
+    }
+});
