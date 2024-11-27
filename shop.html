@@ -546,12 +546,13 @@
                             </ul>
                         </div>
 
-                        <div class="product-card__cart p-32 mb-32 btn bg-gray-50 text-heading hover-bg-main-600 hover-text-white py-11 px-24 rounded-8 flex-center gap-8 fw-medium"  id="clearFilterBtn" >
-                            <i class="ph ph-trash" ></i><span>clear filter</span>
+                        <div class="product-card__cart p-32 mb-32 btn bg-gray-50 text-heading hover-bg-main-600 hover-text-white py-11 px-24 rounded-8 flex-center gap-8 fw-medium"
+                            id="clearFilterBtn">
+                            <i class="ph ph-trash"></i><span>clear filter</span>
                         </div>
 
 
-                        <div class="shop-sidebar__box rounded-8" >
+                        <div class="shop-sidebar__box rounded-8">
                             <img src="assets/images/thumbs/advertise-img1.png" alt="">
                         </div>
                     </div>
@@ -571,13 +572,14 @@
                                     <i class="ph ph-squares-four"></i>
                                 </button>
                             </div>
-                            <div class="position-relative text-gray-500 flex-align gap-4 text-14">
-                                <label for="sorting" class="text-inherit flex-shrink-0">Sort by: </label>
-                                <select class="form-control common-input px-14 py-14 text-inherit rounded-6 w-auto"
-                                id="sorting">
-                                    <option value="1" selected>Default</option>
-                                    <option value="1">Featured</option>
-                                    <option value="1">Today's Deal</option>
+                            <div id="sorting" class="position-relative text-gray-500 flex-align gap-4 text-14">
+                                <label for="sortFilter" class="text-inherit flex-shrink-0">Sort by:</label>
+                                <select id="sortFilter"
+                                    class="form-control common-input px-14 py-14 text-inherit rounded-6 w-auto">
+                                    <option value="price-low">Price: Low to High</option>
+                                    <option value="price-high">Price: High to Low</option>
+                                    <option value="featured">Featured</option>
+                                    <option value="today's deal">Today's Deal</option>
                                 </select>
                             </div>
                             <button type="button"

@@ -25,8 +25,15 @@ class ProductListing {
     initEventListeners() {
         // Sort filter listener
         const sortFilter = document.getElementById('sortFilter');
+        // if (sortFilter) {
+        //     sortFilter.addEventListener('change', () => this.fetchProducts());
+        // }
+
         if (sortFilter) {
-            sortFilter.addEventListener('change', () => this.fetchProducts());
+            sortFilter.addEventListener('change', () => {
+                this.currentPage = 1;
+                this.fetchProducts();
+            });
         }
 
          // Clear filter button listener
@@ -170,7 +177,11 @@ class ProductListing {
 
             if (sortFilter) {
                 const sortValue = sortFilter.value.toLowerCase();
-                if (sortValue === 'featured') {
+                if (sortValue === 'price-low') {
+                    params.append('sort', 'price_asc');
+                } else if (sortValue === 'price-high') {
+                    params.append('sort', 'price_desc');
+                } else if (sortValue === 'featured') {
                     params.append('featured', 'true');
                 } else if (sortValue === "today's deal") {
                     params.append('todaysDeal', 'true');
