@@ -370,49 +370,40 @@ document.addEventListener('DOMContentLoaded', () => {
     productListing = new ProductListing();
 });
 
-
-// This is your existing method where you are handling the "Add to Cart" button click.
 function handleAddToCart(event) {
-    event.preventDefault();
-    
-    const button = event.target.closest('a'); // Get the closest link (Add to Cart button)
-    const productId = button.dataset.productId; // Get the product ID
-    const productPrice = button.dataset.productPrice; // Get the product price
-    const productDiscount = button.dataset.productDiscount; // Get the product discount
-    const productCurrency = button.dataset.productCurrencycode; // Get the product currency
-    const quantity = button.dataset.productQuantity; // Get the quantity (default 1)
+    event.preventDefault(); // Prevent the default behavior (navigation)
 
-    const cartItem = {
-        productId,
-        price: productPrice,
-        discount: productDiscount,
-        currency: productCurrency,
-        quantity
+    const button = event.target.closest('button'); // Get the closest button clicked
+    const productId = button.getAttribute('data-product-id');
+    const productPrice = button.getAttribute('data-product-price');
+    const productDiscount = button.getAttribute('data-product-discount');
+    const productCurrencyCode = button.getAttribute('data-product-currencycode');
+    const productQuantity = button.getAttribute('data-product-quantity');
+
+    const productData = {
+        productId: productId,
+        productCurrencyCode: productCurrencyCode,
+        productQuantity: parseInt(productQuantity),
+        productPrice: parseFloat(productPrice),
+        productDiscount: parseFloat(productDiscount)
     };
 
-    addToCart(cartItem);
-}
-
-// Function to add product to the cart via API
-async function addToCart(cartItem) {
-    try {
-        const response = await fetch('http://localhost:5002/api/web_cart', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(cartItem),
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            alert('Product added to cart!');
-        } else {
-            alert('Failed to add product to cart');
-        }
-    } catch (error) {
-        console.error('Error adding product to cart:', error);
-        alert('There was an error adding the product to the cart');
-    }
+    // Send a POST request to your backend API to save the product in the cart
+    fetch('http://localhost:5002/api/web_cart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(productData), // Send product data as JSON
+    })
+    .then(response => response.json())  // Parse the response as JSON
+    .then(data => {
+        console.log('Product added to cart:', data);
+        alert('Product added to cart!');
+        window.location.href = 'cart.html'; // Redirect to cart page (optional)
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('There was an error adding the product to the cart.');
+    });
 }
