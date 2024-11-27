@@ -29,6 +29,12 @@ class ProductListing {
             sortFilter.addEventListener('change', () => this.fetchProducts());
         }
 
+         // Clear filter button listener
+         const clearFilterBtn = document.getElementById('clearFilterBtn');
+         if (clearFilterBtn) {
+             clearFilterBtn.addEventListener('click', () => this.clearFilters());
+         }
+
         // Radio button change listeners
         document.addEventListener('change', (e) => {
             if (e.target.type === 'radio') {
@@ -43,7 +49,7 @@ class ProductListing {
                         this.selectedFilters.brand = e.target.value;
                         break;
                 }
-                this.currentPage = 1; // Reset to first page when filter changes
+                this.currentPage = 1; 
                 this.fetchProducts();
             }
         });
@@ -152,7 +158,6 @@ class ProductListing {
             let url = new URL(this.baseUrl);
             let params = new URLSearchParams();
 
-            // Add filter parameters if selected
             if (this.selectedFilters.parentCategory) {
                 params.append('parent_category', this.selectedFilters.parentCategory);
             }
@@ -163,21 +168,22 @@ class ProductListing {
                 params.append('brand', this.selectedFilters.brand);
             }
 
-            // Add sorting parameter
-            if (sortFilter && sortFilter.value === 'featured') {
-                params.append('featured', 'true');
+            if (sortFilter) {
+                const sortValue = sortFilter.value.toLowerCase();
+                if (sortValue === 'featured') {
+                    params.append('featured', 'true');
+                } else if (sortValue === "today's deal") {
+                    params.append('todaysDeal', 'true');
+                }
             }
 
-            // Add pagination parameters
             params.append('page', this.currentPage.toString());
             params.append('limit', this.productsPerPage.toString());
 
             url.search = params.toString();
             const response = await fetch(url);
             const data = await response.json();
-
             console.log(data, 'this');
-
 
             if (data.success) {
                 this.totalProducts = data.count || data.products.length;
@@ -190,6 +196,25 @@ class ProductListing {
             console.error('Error fetching products:', error);
             this.showError('productGrid');
         }
+    }
+
+    clearFilters() {
+        this.selectedFilters = {
+            parentCategory: '',
+            subCategory: '',
+            brand: '',
+        };
+        document.querySelectorAll('input[type="radio"]').forEach(input => input.checked = false);
+        const sortFilter = document.getElementById('sorting');
+        if (sortFilter) sortFilter.value = '1';
+
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+        });
+
+        this.currentPage = 1; 
+        this.fetchProducts();
     }
 
     sortProducts(products, sortMethod) {
