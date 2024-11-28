@@ -268,7 +268,7 @@ class ProductListing {
 
         return `
             <div class="product-card h-100 p-4 border border-gray-200 rounded-lg hover:border-blue-600 transition-all">
-                 <a href="product-details.html?id${product._id}" class="product-card__thumb flex-center rounded-8 bg-gray-50 position-relative">
+                 <a href="product-details.html?id=${product._id}" class="product-card__thumb flex-center rounded-8 bg-gray-50 position-relative">
                 <img src="${imageUrl}" alt="${product.name}" class="w-auto ">
                 ${product.todaysDeal ?
                 '<span class="product-card__badge bg-primary-600 px-8 py-4 text-sm text-white position-absolute inset-inline-start-0 inset-block-start-0">Today\'s Deal</span>' :
