@@ -28,6 +28,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 setupQuantityControls();
                 setupWhatsAppSharing(product);
                 handleAddToCart(product);
+
+                if (product.parent_category?.[0]) {
+                    fetchRelatedProducts(product.parent_category[0]._id);
+                } else {
+                    console.warn('No parent category available for related products');
+                }
+
             } else {
                 console.error('Failed to fetch product details');
             }
@@ -358,6 +365,118 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    function displayRelatedProducts(products) {
+        const relatedProductsContainer = document.querySelector('.new-arrival__slider');
+        if (!relatedProductsContainer) {
+            console.error('No container found for related products');
+            return;
+        }
+    
+        // Clear any existing content
+        relatedProductsContainer.innerHTML = '';
+    
+        // Limit to max 5 related products
+        const limitedProducts = products.slice(0, 5);
+    
+        // Create a container to hold the product cards
+        const productCardsContainer = document.createElement('div');
+        productCardsContainer.className = 'd-flex gap-16';
+    
+        // Loop through the products and render each product card
+        limitedProducts.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card h-100 p-8 border border-gray-100 hover-border-main-600 rounded-16 position-relative transition-2';
+    
+            // Ensure pricing is handled correctly
+            const aedPricing = product.country_pricing?.find(p => p.currency_code === 'AED') || 
+                               product.country_pricing?.[0];
+            const currentPrice = aedPricing ? aedPricing.discount : product.price;
+            const originalPrice = aedPricing ? aedPricing.unit_price : currentPrice * 1.5;
+    
+            productCard.innerHTML = `
+                <a href="product-details.html?id=${product._id}" class="product-card__thumb flex-center">
+                    <img src="${product.image || '/assets/images/default-product.png'}" alt="${product.name}">
+                </a>
+                <div class="product-card__content p-sm-2">
+                    <h6 class="title text-lg fw-semibold mt-12 mb-8">
+                        <a href="product-details.html?id=${product._id}" class="link text-line-2">${product.name}</a>
+                    </h6>
+                    <div class="flex-align gap-4">
+                        <span class="text-main-600 text-md d-flex"><i class="ph-fill ph-storefront"></i></span>
+                        <span class="text-gray-500 text-xs">By Games Corner</span>
+                    </div>
+                    <div class="product-card__content mt-12">
+                        <div class="product-card__price mb-8">
+                            <span class="text-heading text-md fw-semibold">AED ${currentPrice.toFixed(2)} <span class="text-gray-500 fw-normal">/Qty</span></span>
+                            ${originalPrice ? `<span class="text-gray-400 text-md fw-semibold text-decoration-line-through">AED ${originalPrice.toFixed(2)}</span>` : ''}
+                        </div>
+                       
+                        <button onclick="window.location.href='product-details.html?id=${product._id}'" 
+                            class="product-card__cart btn bg-main-50 text-main-600 hover-bg-main-600 hover-text-white py-11 px-24 rounded-pill flex-align gap-8 mt-24 w-100 justify-content-center">
+                            Add To Cart <i class="ph ph-shopping-cart"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+    
+            productCardsContainer.appendChild(productCard);
+        });
+    
+        relatedProductsContainer.appendChild(productCardsContainer);
+    
+        // Initialize Slick Slider for related products
+        try {
+            $('.new-arrival__slider').slick({
+                slidesToShow: 4,
+                slidesToScroll: 1,
+                arrows: true,
+                infinite: false,
+                prevArrow: '#new-arrival-prev',
+                nextArrow: '#new-arrival-next',
+                responsive: [
+                    {
+                        breakpoint: 1200,
+                        settings: { slidesToShow: 3 }
+                    },
+                    {
+                        breakpoint: 992,
+                        settings: { slidesToShow: 2 }
+                    },
+                    {
+                        breakpoint: 768,
+                        settings: { slidesToShow: 1 }
+                    }
+                ]
+            });
+        } catch (error) {
+            console.warn('Slick slider initialization for related products failed:', error);
+        }
+    }
+    
+    async function fetchRelatedProducts(parentCategory) {
+        try {
+            // Ensure you're using the correct API endpoint and parameters
+            const response = await fetch(`http://localhost:5002/api/productweb?parent_category=${encodeURIComponent(parentCategory)}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+    
+            const data = await response.json();
+            
+            if (data.success && data.products && data.products.length > 0) {
+                // Filter out the current product to avoid showing it in related products
+                const currentProductId = new URLSearchParams(window.location.search).get('id');
+                const relatedProducts = data.products.filter(product => product._id !== currentProductId);
+                
+                displayRelatedProducts(relatedProducts);
+            } else {
+                console.warn('No related products found');
+            }
+        } catch (error) {
+            console.error('Error fetching related products:', error);
+        }
+    }
     // Initialize the page
     fetchProductDetails();
 });
