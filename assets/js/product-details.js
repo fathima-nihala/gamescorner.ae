@@ -126,6 +126,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Reinitialize sliders if using a slider library
     }
 
+    const facebookButton = document.getElementById('facebook');
+    const currentURL = encodeURIComponent(window.location.href);
+    facebookButton.href = `https://www.facebook.com/sharer/sharer.php?u=${currentURL}`;
+
+    const whatsappButton = document.getElementById('whatsapp');
+    whatsappButton.href = `https://api.whatsapp.com/send?text=${encodeURIComponent('Check this out: ' + window.location.href)}`;
+    
     function setupQuantityControls() {
         const quantityMinus = document.querySelector('.quantity__minus');
         const quantityPlus = document.querySelector('.quantity__plus');
