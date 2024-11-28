@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
             product.gallery3, 
             product.gallery4, 
             product.gallery5
-        ].filter(img => img); // Remove any null/undefined images
+        ].filter(img => img); 
 
         images.forEach((img, index) => {
             // Thumb slider
@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function setupWhatsAppSharing(product) {
-        const whatsappButton = document.querySelector('.ph-whatsapp-logo').closest('a');
+        const whatsappButton = document.getElementById('whatsapp-order');
         
         whatsappButton.addEventListener('click', (e) => {
             e.preventDefault();
@@ -157,9 +157,65 @@ document.addEventListener('DOMContentLoaded', function() {
             message += `Price: AED ${aedPricing ? aedPricing.discount : product.price}\n`;
             message += `Quantity: ${quantity}\n`;
             message += `Description: ${stripHtmlTags(product.description)}\n`;
+            message += `image: ${stripHtmlTags(product.image)}\n`;
 
-            const encodedMessage = encodeURIComponent(message);
-            window.open(`https://wa.me/971542205527?text=${encodedMessage}`, '_blank');
+            const encodedMessage = encodeURIComponent(message)
+            .replace(/%0A/g, '%0A') 
+            .replace(/%20/g, '+');
+
+            const phoneNumber = '918086835242';
+
+            function generateWhatsAppUrls(phoneNumber, message) {
+                return [
+                    `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${message}`,
+                    `whatsapp://send?phone=${phoneNumber}&text=${message}`,
+                    `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${message}`
+                ];
+            }
+    
+            // Advanced device detection and URL handling
+            function openWhatsApp(urls) {
+                const userAgent = navigator.userAgent.toLowerCase();
+                const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/.test(userAgent);
+                
+                // Prioritize URLs based on device
+                const urlsToTry = isMobile 
+                    ? [urls[0], urls[1], urls[2]]  // Mobile priority
+                    : [urls[2], urls[0]];  // Desktop priority
+    
+                function attemptOpen(index = 0) {
+                    if (index >= urlsToTry.length) {
+                        navigator.clipboard.writeText(message).then(() => {
+                            alert('Could not open WhatsApp. Message copied to clipboard.');
+                        }).catch(() => {
+                            alert('Unable to open WhatsApp. Please copy the message manually.');
+                        });
+                        return;
+                    }
+    
+                    const url = urlsToTry[index];
+                    
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+    
+                    try {
+                        link.click();
+                        
+                        setTimeout(() => {
+                            document.body.removeChild(link);
+                        }, 100);
+                    } catch (error) {
+                        console.error(`Failed to open URL: ${url}`, error);
+                        attemptOpen(index + 1);
+                    }
+                }
+                attemptOpen();
+            }
+    
+            const whatsappUrls = generateWhatsAppUrls(phoneNumber, encodedMessage);
+            openWhatsApp(whatsappUrls);
         });
     }
 
