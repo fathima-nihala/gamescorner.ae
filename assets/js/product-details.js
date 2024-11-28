@@ -106,11 +106,11 @@ document.addEventListener('DOMContentLoaded', function () {
     function setupImageGallery(product) {
         const mainImageContainer = document.querySelector('.product-details__thumb-slider');
         const thumbnailContainer = document.querySelector('.product-details__images-slider');
-    
+
         // Clear existing content
         mainImageContainer.innerHTML = '';
         thumbnailContainer.innerHTML = '';
-    
+
         // Get all valid images (filter out empty strings)
         const images = [
             product.image,
@@ -120,12 +120,12 @@ document.addEventListener('DOMContentLoaded', function () {
             product.gallery4,
             product.gallery5
         ].filter(img => img && img.trim() !== '');
-    
+
         // If no images available, set a default image
         if (images.length === 0) {
             images.push('/assets/images/default-product.png');
         }
-    
+
         // Set up main image
         const mainImageDiv = document.createElement('div');
         mainImageDiv.innerHTML = `
@@ -138,17 +138,17 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
         `;
         mainImageContainer.appendChild(mainImageDiv);
-    
+
         // Create thumbnail container
         const thumbnailWrapperDiv = document.createElement('div');
         thumbnailWrapperDiv.className = 'mt-24';
         thumbnailContainer.appendChild(thumbnailWrapperDiv);
-    
+
         // Create thumbnail slider
         const sliderDiv = document.createElement('div');
         sliderDiv.className = 'thumbnail-slider';
         thumbnailWrapperDiv.appendChild(sliderDiv);
-    
+
         // Add thumbnails
         images.forEach((img, index) => {
             const thumbnailDiv = document.createElement('div');
@@ -165,13 +165,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             `;
             sliderDiv.appendChild(thumbnailDiv);
-    
+
             // Add click handler for each thumbnail
-            thumbnailDiv.addEventListener('click', function() {
+            thumbnailDiv.addEventListener('click', function () {
                 // Update main image
                 const mainImage = document.querySelector('.main-product-image');
                 mainImage.src = img;
-                
+
                 // Update active state
                 document.querySelectorAll('.thumbnail-item').forEach(thumb => {
                     thumb.classList.remove('active');
@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 thumbnailDiv.classList.add('active');
             });
         });
-    
+
         // Initialize Slick slider
         try {
             $('.thumbnail-slider').slick({
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 ]
             });
-    
+
             document.querySelector('.thumbnail-item')?.classList.add('active');
         } catch (error) {
             console.warn('Slick slider initialization failed:', error);
@@ -312,9 +312,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function updateProductSpecifications(product) {
-       
+
         const specsList = document.querySelector('.product-dContent__box ul');
-        
+
 
         const specifications = [
             { label: 'Product Type', value: product.product_type || 'N/A' },
@@ -371,28 +371,29 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('No container found for related products');
             return;
         }
-    
+
+        // First destroy existing slick instance if it exists
+        if ($(relatedProductsContainer).hasClass('slick-initialized')) {
+            $(relatedProductsContainer).slick('unslick');
+        }
+
         // Clear any existing content
         relatedProductsContainer.innerHTML = '';
-    
+
         // Limit to max 5 related products
         const limitedProducts = products.slice(0, 5);
-    
-        // Create a container to hold the product cards
-        const productCardsContainer = document.createElement('div');
-        productCardsContainer.className = 'd-flex gap-16';
-    
-        // Loop through the products and render each product card
+
+        // Create product cards directly in the container (remove the extra wrapper div)
         limitedProducts.forEach(product => {
             const productCard = document.createElement('div');
             productCard.className = 'product-card h-100 p-8 border border-gray-100 hover-border-main-600 rounded-16 position-relative transition-2';
-    
+
             // Ensure pricing is handled correctly
-            const aedPricing = product.country_pricing?.find(p => p.currency_code === 'AED') || 
-                               product.country_pricing?.[0];
+            const aedPricing = product.country_pricing?.find(p => p.currency_code === 'AED') ||
+                product.country_pricing?.[0];
             const currentPrice = aedPricing ? aedPricing.discount : product.price;
             const originalPrice = aedPricing ? aedPricing.unit_price : currentPrice * 1.5;
-    
+
             productCard.innerHTML = `
                 <a href="product-details.html?id=${product._id}" class="product-card__thumb flex-center">
                     <img src="${product.image || '/assets/images/default-product.png'}" alt="${product.name}">
@@ -418,57 +419,89 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                 </div>
             `;
-    
-            productCardsContainer.appendChild(productCard);
+
+            relatedProductsContainer.appendChild(productCard);
         });
-    
-        relatedProductsContainer.appendChild(productCardsContainer);
-    
-        // Initialize Slick Slider for related products
-        try {
-            $('.new-arrival__slider').slick({
-                slidesToShow: 4,
-                slidesToScroll: 1,
-                arrows: true,
-                infinite: false,
-                prevArrow: '#new-arrival-prev',
-                nextArrow: '#new-arrival-next',
-                responsive: [
-                    {
-                        breakpoint: 1200,
-                        settings: { slidesToShow: 3 }
-                    },
-                    {
-                        breakpoint: 992,
-                        settings: { slidesToShow: 2 }
-                    },
-                    {
-                        breakpoint: 768,
-                        settings: { slidesToShow: 1 }
-                    }
-                ]
-            });
-        } catch (error) {
-            console.warn('Slick slider initialization for related products failed:', error);
-        }
+
+        // Initialize Slick Slider with a slight delay to ensure DOM is ready
+        setTimeout(() => {
+            try {
+                $(relatedProductsContainer).slick({
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    autoplay: false,
+                    autoplaySpeed: 2000,
+                    speed: 1500,
+                    dots: false,
+                    pauseOnHover: true,
+                    arrows: true,
+                    draggable: true,
+                    rtl: $('html').attr('dir') === 'rtl' ? true : false,
+                    arrows: true,
+                    infinite: false,
+                    speed: 900,
+                    infinite: true,
+                    prevArrow: $('.new-arrival-prev'),  // Changed to jQuery selector
+                    nextArrow: $('.new-arrival-next'),  // Changed to jQuery selector
+                    responsive: [
+                        {
+                            breakpoint: 1599,
+                            settings: {
+                                slidesToShow: 6,
+                                arrows: false,
+                            }
+                        },
+                        {
+                            breakpoint: 1399,
+                            settings: {
+                                slidesToShow: 4,
+                                arrows: false,
+                            }
+                        },
+                        {
+                            breakpoint: 992,
+                            settings: {
+                                slidesToShow: 3,
+                                arrows: false,
+                            }
+                        },
+                        {
+                            breakpoint: 575,
+                            settings: {
+                                slidesToShow: 2,
+                                arrows: false,
+                            }
+                        },
+                        {
+                            breakpoint: 424,
+                            settings: {
+                                slidesToShow: 1,
+                                arrows: false,
+                            }
+                        },
+                    ]
+                });
+            } catch (error) {
+                console.error('Slick slider initialization failed:', error);
+            }
+        }, 100);
     }
-    
+
+    // Rest of the fetchRelatedProducts function remains the same
     async function fetchRelatedProducts(parentCategory) {
         try {
-            // Ensure you're using the correct API endpoint and parameters
             const response = await fetch(`http://localhost:5002/api/productweb?parent_category=${encodeURIComponent(parentCategory)}`);
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-    
+
             const data = await response.json();
-            
+
             if (data.success && data.products && data.products.length > 0) {
-                // Filter out the current product to avoid showing it in related products
                 const currentProductId = new URLSearchParams(window.location.search).get('id');
                 const relatedProducts = data.products.filter(product => product._id !== currentProductId);
-                
+
                 displayRelatedProducts(relatedProducts);
             } else {
                 console.warn('No related products found');

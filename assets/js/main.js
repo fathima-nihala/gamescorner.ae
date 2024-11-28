@@ -513,7 +513,7 @@
   
   // ========================= New arrival Slider Js Start ==============
   $('.new-arrival__slider').slick({
-    slidesToShow: 6,
+    slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: false,
     autoplaySpeed: 2000,
