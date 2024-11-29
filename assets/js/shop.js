@@ -283,7 +283,7 @@ class ProductListing {
                       <span class="text-heading text-md fw-semibold ">AED ${discount}<span
                       class="text-gray-500 fw-normal"></span> </span>
                  </div>
-                  <a href="" class="product-card__cart btn bg-gray-50 text-heading hover-bg-main-600 hover-text-white py-11 px-24 rounded-8 flex-center gap-8 fw-medium" tabindex="0" data-product-id="${product._id}" data-product-price="${price}" data-product-discount="${discount}" data-product-currencycode="${currencyCode}" data-product-quantity="1" onClick="handleAddToCart">
+                  <a href="" class="product-card__cart btn bg-gray-50 text-heading hover-bg-main-600 hover-text-white py-11 px-24 rounded-8 flex-center gap-8 fw-medium" tabindex="0" data-product-id="${product._id}" data-product-price="${price}" data-product-discount="${discount}" data-product-currencycode="${currencyCode}" data-product-quantity="1"  onClick="handleAddToCart(event)">
                         Add To Cart <i class="ph ph-shopping-cart"></i>
                     </a>
                 </div>
@@ -369,19 +369,22 @@ let productListing;
 document.addEventListener('DOMContentLoaded', () => {
     productListing = new ProductListing();
 });
-
-
 function handleAddToCart(event) {
-    event.preventDefault(); 
+    event.preventDefault(); // Prevent the default link behavior
 
     const webtoken = localStorage.getItem('webtoken');
     if (!webtoken) {
-        alert('Logging first to handle this');
+        alert('Please login first');
         window.location.href = "account.html";  
         return;
     }
 
-    const button = event.target.closest('a'); 
+    const button = event.target.closest('a'); // Ensure we get the correct element
+    if (!button) {
+        console.error('Unable to find the button element.');
+        return;
+    }
+
     const productId = button.getAttribute('data-product-id');
     const productPrice = button.getAttribute('data-product-price');
     const productDiscount = button.getAttribute('data-product-discount');
@@ -389,9 +392,9 @@ function handleAddToCart(event) {
     const productQuantity = button.getAttribute('data-product-quantity') || 1;
 
     const productData = {
-        productId: productId,
+        productId,
         product_currecy_code: productCurrencyCode, 
-        product_quantity: parseInt(productQuantity),
+        product_quantity: parseInt(productQuantity, 10),
         product_price: parseFloat(productPrice),
         product_discount: parseFloat(productDiscount)
     };
@@ -400,13 +403,16 @@ function handleAddToCart(event) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${webtoken}` 
+            'Authorization': `Bearer ${webtoken}` // Ensure this matches your backend expectation
         },
         body: JSON.stringify(productData),
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            return response.text().then(text => {
+                console.error('Error response:', text);
+                throw new Error(text || 'Network response was not ok');
+            });
         }
         return response.json();
     })
@@ -416,12 +422,6 @@ function handleAddToCart(event) {
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error occurred while adding the product to the cart.');
+        alert('Error occurred while adding the product to the cart: ' + error.message);
     });
 }
-
-document.addEventListener('click', (e) => {
-    if (e.target.closest('[onClick="handleAddToCart"]')) {
-        handleAddToCart(e);
-    }
-});

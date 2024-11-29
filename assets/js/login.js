@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Login handler function
+
 async function handleLogin() {
     const loginForm = document.getElementById('loginForm');
     const email = document.getElementById('email').value.trim();
@@ -27,23 +27,25 @@ async function handleLogin() {
     try {
         const response = await fetch('http://localhost:5002/api/weblogin', {
             method: 'POST',
+            credentials: 'include', 
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email, password }),
         });
 
         const data = await response.json();
 
         if (response.ok && data.webtoken) {
-            window.alert('Login successful!');
+            alert('Login successful!');
             localStorage.setItem('webtoken', data.webtoken);
-            document.cookie = `webtoken=${data.webtoken}; path=/; max-age=${30 * 24 * 60 * 60}`; // 30 days expiry
 
-            loginForm.reset();
+            if (loginForm) {
+                loginForm.reset(); 
+            }
 
             setTimeout(() => {
-                window.location.href = "index.html"; // Change to the page you want to redirect to after login
+                window.location.href = "index.html"; // Redirect after login
             }, 1000);
         } else {
             alert(data.message || 'Login failed');
