@@ -342,28 +342,80 @@ document.addEventListener('DOMContentLoaded', function () {
         `).join('');
     }
 
+
     function handleAddToCart(product) {
-        const addToCartButton = document.querySelector('[onClick="handleAddToCart"]');
-
-        addToCartButton.addEventListener('click', (e) => {
-            const quantity = document.querySelector('.quantity__input').value;
-            const aedPricing = product.country_pricing.find(p => p.currency_code === 'AED') ||
-                product.country_pricing[0];
-
-            // Implement your cart logic here
-            // This could involve:
-            // 1. Adding item to localStorage/sessionStorage
-            // 2. Sending data to backend via fetch
-            // 3. Updating cart count in UI
-
-            console.log('Adding to cart:', {
+        const webtoken = localStorage.getItem('webtoken');
+        if (!webtoken) {
+            alert('Please login first');
+            window.location.href = "account.html";
+            return;
+        }
+    
+        if (!product) {
+            console.error('No product data available');
+            return;
+        }
+    
+        // Default quantity to 1 if not specified
+        const quantity = 1;
+    
+        // Find AED pricing or default to first pricing option
+        const aedPricing = product.country_pricing.find(p => p.currency_code === 'AED') ||
+            product.country_pricing[0];
+    
+        const productData = {
+            productId: product._id,
+            product_currecy_code: aedPricing ? aedPricing.currency_code : 'AED',
+            product_quantity: quantity,
+            product_price: aedPricing ? aedPricing.discount : product.price,
+            product_discount: aedPricing ? aedPricing.unit_price : (product.price * 1.5)
+        };
+    
+        fetch('http://localhost:5002/api/web_cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${webtoken}`
+            },
+            body: JSON.stringify(productData),
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    console.error('Error response:', text);
+                    throw new Error(text || 'Network response was not ok');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Product added to cart:', data);
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const existingItemIndex = cart.findIndex(item => item.productId === product._id);
+            
+            const cartItem = {
                 productId: product._id,
                 name: product.name,
-                price: aedPricing ? aedPricing.discount : product.price,
-                quantity: quantity
-            });
+                price: productData.product_price,
+                quantity: quantity,
+                image: product.image
+            };
+            
+            if (existingItemIndex > -1) {
+                cart[existingItemIndex].quantity += quantity;
+            } else {
+                cart.push(cartItem);
+            }
+            
+            localStorage.setItem('cart', JSON.stringify(cart));
+            alert('Product added to cart!');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error occurred while adding the product to the cart: ' + error.message);
         });
     }
+
 
     function displayRelatedProducts(products) {
         const relatedProductsContainer = document.querySelector('.new-arrival__slider');
@@ -393,6 +445,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 product.country_pricing?.[0];
             const currentPrice = aedPricing ? aedPricing.discount : product.price;
             const originalPrice = aedPricing ? aedPricing.unit_price : currentPrice * 1.5;
+            const currencyCode = aedPricing ? aedPricing.currency_code : 'AED';
 
             productCard.innerHTML = `
                 <a href="product-details.html?id=${product._id}" class="product-card__thumb flex-center">
@@ -413,7 +466,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                        
                         <button onclick="window.location.href='product-details.html?id=${product._id}'" 
-                            class="product-card__cart btn bg-main-50 text-main-600 hover-bg-main-600 hover-text-white py-11 px-24 rounded-pill flex-align gap-8 mt-24 w-100 justify-content-center">
+                            class="product-card__cart btn bg-main-50 text-main-600 hover-bg-main-600 hover-text-white py-11 px-24 rounded-pill flex-align gap-8 mt-24 w-100 justify-content-center" data-product-id="${product._id}" data-product-price="${currentPrice}" data-product-discount="${originalPrice}" data-product-currencycode="${currencyCode}" data-product-quantity="1" onclick="handleAddToCart(product)">
                             Add To Cart <i class="ph ph-shopping-cart"></i>
                         </button>
                     </div>
@@ -441,8 +494,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     infinite: false,
                     speed: 900,
                     infinite: true,
-                    prevArrow: $('.new-arrival-prev'),  // Changed to jQuery selector
-                    nextArrow: $('.new-arrival-next'),  // Changed to jQuery selector
+                    prevArrow: $('.new-arrival-prev'),
+                    nextArrow: $('.new-arrival-next'),
                     responsive: [
                         {
                             breakpoint: 1599,
@@ -513,3 +566,5 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize the page
     fetchProductDetails();
 });
+
+

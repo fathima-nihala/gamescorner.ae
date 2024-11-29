@@ -369,8 +369,9 @@ let productListing;
 document.addEventListener('DOMContentLoaded', () => {
     productListing = new ProductListing();
 });
+
 function handleAddToCart(event) {
-    event.preventDefault(); // Prevent the default link behavior
+    event.preventDefault(); 
 
     const webtoken = localStorage.getItem('webtoken');
     if (!webtoken) {
@@ -379,7 +380,7 @@ function handleAddToCart(event) {
         return;
     }
 
-    const button = event.target.closest('a'); // Ensure we get the correct element
+    const button = event.target.closest('a');
     if (!button) {
         console.error('Unable to find the button element.');
         return;
