@@ -9694,9 +9694,9 @@ input:focus-visible {
 
 @media only screen and (max-width: 480px) {
 
-    .account {
-        display: none;
-    }
+        /* .account {
+            display: none;
+        } */
 
     .assemble {
         padding: 6px 10px;
@@ -9754,4 +9754,12 @@ input:focus-visible {
     padding: 0 10px;
     color: #6b7280;
     font-size: 14px;
+}
+
+
+/* parentcat-image */
+
+.parentcat-img{
+    max-width: 80px;
+    height: 80px;
 }
