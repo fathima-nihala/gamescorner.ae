@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const apiUrlSendOtp = "http://localhost:5002/api/web_forgot";
-  const apiUrlVerifyOtp = "http://localhost:5002/api/web_verify";
+  const apiUrlSendOtp = "https://api.gamescorner.ae/api/web_forgot";
+  const apiUrlVerifyOtp = "https://api.gamescorner.ae/api/web_verify";
 
   // Function to send OTP
   async function sendOtp(email) {
@@ -14,11 +14,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Function to verify OTP
-  async function verifyOtp(email, resetPasswordOTP ) {
+  async function verifyOtp(email, resetPasswordOTP) {
     const response = await fetch(apiUrlVerifyOtp, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, resetPasswordOTP  }),
+      body: JSON.stringify({ email, resetPasswordOTP }),
     });
     if (!response.ok) throw new Error(await response.text());
     return await response.json();
@@ -86,9 +86,9 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       const email = emailElement.value.trim();
-      const resetPasswordOTP  = otpElement.value.trim();
+      const resetPasswordOTP = otpElement.value.trim();
 
-      if (!email || !resetPasswordOTP ) {
+      if (!email || !resetPasswordOTP) {
         otpStatusMessage.innerText = "Both email and OTP are required.";
         return;
       }
@@ -97,7 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
       verifyOtpButton.innerText = "Verifying...";
 
       try {
-        const data = await verifyOtp(email, resetPasswordOTP );
+        const data = await verifyOtp(email, resetPasswordOTP);
         otpStatusMessage.innerText = data.message;
 
         if (data.success) {

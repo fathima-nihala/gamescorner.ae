@@ -1,6 +1,6 @@
 class ProductListing {
     constructor() {
-        this.baseUrl = 'http://localhost:5002/api/productweb';
+        this.baseUrl = 'https://api.gamescorner.ae/api/productweb';
         this.currentPage = 1;
         this.productsPerPage = 20;
         this.allProducts = [];
@@ -34,11 +34,11 @@ class ProductListing {
             });
         }
 
-         // Clear filter button listener
-         const clearFilterBtn = document.getElementById('clearFilterBtn');
-         if (clearFilterBtn) {
-             clearFilterBtn.addEventListener('click', () => this.clearFilters());
-         }
+        // Clear filter button listener
+        const clearFilterBtn = document.getElementById('clearFilterBtn');
+        if (clearFilterBtn) {
+            clearFilterBtn.addEventListener('click', () => this.clearFilters());
+        }
 
         // Radio button change listeners
         document.addEventListener('change', (e) => {
@@ -54,7 +54,7 @@ class ProductListing {
                         this.selectedFilters.brand = e.target.value;
                         break;
                 }
-                this.currentPage = 1; 
+                this.currentPage = 1;
                 this.fetchProducts();
             }
         });
@@ -62,7 +62,7 @@ class ProductListing {
 
     async fetchCategories() {
         try {
-            const response = await fetch('http://localhost:5002/api/category');
+            const response = await fetch('https://api.gamescorner.ae/api/category');
             const data = await response.json();
 
             if (data.success && data.categories) {
@@ -78,7 +78,7 @@ class ProductListing {
 
     async fetchBrands() {
         try {
-            const response = await fetch('http://localhost:5002/api/brand');
+            const response = await fetch('https://api.gamescorner.ae/api/brand');
             const data = await response.json();
 
             if (data.success && data.brands) {
@@ -221,7 +221,7 @@ class ProductListing {
             behavior: 'smooth',
         });
 
-        this.currentPage = 1; 
+        this.currentPage = 1;
         this.fetchProducts();
     }
 
@@ -264,7 +264,7 @@ class ProductListing {
         const price = aedPricing?.unit_price || 'N/A';
         const discount = aedPricing?.discount || 'N/A';
         const currencyCode = aedPricing ? aedPricing.currency_code : 'N/A';
-        
+
 
         return `
             <div class="product-card h-100 p-4 border border-gray-200 rounded-lg hover:border-blue-600 transition-all">
@@ -371,12 +371,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function handleAddToCart(event) {
-    event.preventDefault(); 
+    event.preventDefault();
 
     const webtoken = localStorage.getItem('webtoken');
     if (!webtoken) {
         alert('Please login first');
-        window.location.href = "account.html";  
+        window.location.href = "account.html";
         return;
     }
 
@@ -394,13 +394,13 @@ function handleAddToCart(event) {
 
     const productData = {
         productId,
-        product_currecy_code: productCurrencyCode, 
+        product_currecy_code: productCurrencyCode,
         product_quantity: parseInt(productQuantity, 10),
         product_price: parseFloat(productPrice),
         product_discount: parseFloat(productDiscount)
     };
 
-    fetch('http://localhost:5002/api/web_cart', {
+    fetch('https://api.gamescorner.ae/api/web_cart', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -408,21 +408,21 @@ function handleAddToCart(event) {
         },
         body: JSON.stringify(productData),
     })
-    .then(response => {
-        if (!response.ok) {
-            return response.text().then(text => {
-                console.error('Error response:', text);
-                throw new Error(text || 'Network response was not ok');
-            });
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Product added to cart:', data);
-        alert('Product added to cart!');
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error occurred while adding the product to the cart: ' + error.message);
-    });
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    console.error('Error response:', text);
+                    throw new Error(text || 'Network response was not ok');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Product added to cart:', data);
+            alert('Product added to cart!');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error occurred while adding the product to the cart: ' + error.message);
+        });
 }

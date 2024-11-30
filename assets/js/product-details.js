@@ -8,10 +8,10 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
-    // Fetch product details
+    // Fetch product details    
     async function fetchProductDetails() {
         try {
-            const response = await fetch(`http://localhost:5002/api/product/${productId}`);
+            const response = await fetch(`https://api.gamescorner.ae/api/product/${productId}`);
 
             // Check if response is okay
             if (!response.ok) {
@@ -314,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function fetchRelatedProducts(parentCategory) {
         try {
-            const response = await fetch(`http://localhost:5002/api/productweb?parent_category=${encodeURIComponent(parentCategory)}`);
+            const response = await fetch(`https://api.gamescorner.ae/api/productweb?parent_category=${encodeURIComponent(parentCategory)}`);
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -351,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function () {
         relatedProductsContainer.innerHTML = '';
 
         // Limit to max 5 related products
-        const limitedProducts = products.slice(0, 5);
+        const limitedProducts = products.slice(0, 5)
 
         // Create product cards directly in the container (remove the extra wrapper div)
         limitedProducts.forEach(product => {
@@ -527,7 +527,7 @@ function handleAddToCart(productOrEvent) {
     }
 
     // Make the API call
-    fetch('http://localhost:5002/api/web_cart', {
+    fetch('https://api.gamescorner.ae/api/web_cart', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

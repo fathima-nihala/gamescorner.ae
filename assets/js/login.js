@@ -25,9 +25,9 @@ async function handleLogin() {
     }
 
     try {
-        const response = await fetch('http://localhost:5002/api/weblogin', {
+        const response = await fetch('https://api.gamescorner.ae/api/weblogin', {
             method: 'POST',
-            credentials: 'include', 
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -41,7 +41,7 @@ async function handleLogin() {
             localStorage.setItem('webtoken', data.webtoken);
 
             if (loginForm) {
-                loginForm.reset(); 
+                loginForm.reset();
             }
 
             setTimeout(() => {

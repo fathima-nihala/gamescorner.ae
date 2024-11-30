@@ -1,5 +1,5 @@
 // reset-password.js
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('resetPasswordForm');
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('confirm-password');
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
     password.addEventListener('input', validatePasswords);
     confirmPassword.addEventListener('input', validatePasswords);
 
-    form.addEventListener('submit', async function(e) {
+    form.addEventListener('submit', async function (e) {
         e.preventDefault();
 
         if (!validatePasswords()) {
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.disabled = true;
             submitButton.textContent = 'Resetting...';
 
-            const response = await fetch('http://localhost:5002/api/web_reset', {
+            const response = await fetch('https://api.gamescorner.ae/api/web_reset', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

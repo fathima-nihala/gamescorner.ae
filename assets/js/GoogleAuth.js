@@ -1,7 +1,7 @@
 
 const authConfig = {
     clientId: '98946538407-4k5pr38hpks6rkoiqjklarsrprsf8rhc.apps.googleusercontent.com',
-    apiEndpoint: 'http://localhost:5002/api/google_login',
+    apiEndpoint: 'https://api.gamescorner.ae/api/google_login',
     redirectPath: '/index.html'
 };
 
@@ -86,6 +86,6 @@ function showError(message) {
 }
 
 // Initialize everything when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initializeGoogleAuth();
 });
