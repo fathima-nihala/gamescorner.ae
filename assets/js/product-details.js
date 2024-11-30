@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('id');
 
-    // Check if productId exists
     if (!productId) {
         console.error('No product ID found in URL');
         window.location.href = 'shop.html';
@@ -25,7 +24,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const product = data.product;
                 updateProductDetails(product);
                 setupImageGallery(product);
-                setupQuantityControls();
                 setupWhatsAppSharing(product);
                 handleAddToCart(product);
 
@@ -56,10 +54,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (descriptionElement) {
             descriptionElement.textContent = stripHtmlTags(product.description) || 'No description available.';
         }
-
-        // Update rating (using default 4.7 if no rating provided)
-        const ratingContainer = document.querySelector('.flex-align.gap-12.flex-wrap .flex-align.gap-8');
-        ratingContainer.innerHTML = generateStarRating(product.rating || 4.7);
 
         // Update description
         document.querySelector('.product-details__content p').textContent =
@@ -92,14 +86,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const temp = document.createElement('div');
         temp.innerHTML = html;
         return temp.textContent || temp.innerText || '';
-    }
-
-    function generateStarRating(rating) {
-        return Array(5).fill().map((_, i) =>
-            `<span class="text-15 fw-medium text-warning-600 d-flex">
-                <i class="ph-fill ph-star ${i < Math.round(rating) ? 'active' : ''}"></i>
-            </span>`
-        ).join('');
     }
 
 
@@ -218,23 +204,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const whatsappButton = document.getElementById('whatsapp');
     whatsappButton.href = `https://api.whatsapp.com/send?text=${encodeURIComponent('Check this out: ' + window.location.href)}`;
 
-    function setupQuantityControls() {
-        const quantityMinus = document.querySelector('.quantity__minus');
-        const quantityPlus = document.querySelector('.quantity__plus');
-        const quantityInput = document.querySelector('.quantity__input');
-
-        quantityMinus.addEventListener('click', () => {
-            let currentValue = parseInt(quantityInput.value);
-            if (currentValue > 1) {
-                quantityInput.value = currentValue - 1;
-            }
-        });
-
-        quantityPlus.addEventListener('click', () => {
-            let currentValue = parseInt(quantityInput.value);
-            quantityInput.value = currentValue + 1;
-        });
-    }
 
     function setupWhatsAppSharing(product) {
         const whatsappButton = document.getElementById('whatsapp-order');
@@ -343,79 +312,28 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    function handleAddToCart(product) {
-        const webtoken = localStorage.getItem('webtoken');
-        if (!webtoken) {
-            alert('Please login first');
-            window.location.href = "account.html";
-            return;
-        }
-    
-        if (!product) {
-            console.error('No product data available');
-            return;
-        }
-    
-        // Default quantity to 1 if not specified
-        const quantity = 1;
-    
-        // Find AED pricing or default to first pricing option
-        const aedPricing = product.country_pricing.find(p => p.currency_code === 'AED') ||
-            product.country_pricing[0];
-    
-        const productData = {
-            productId: product._id,
-            product_currecy_code: aedPricing ? aedPricing.currency_code : 'AED',
-            product_quantity: quantity,
-            product_price: aedPricing ? aedPricing.discount : product.price,
-            product_discount: aedPricing ? aedPricing.unit_price : (product.price * 1.5)
-        };
-    
-        fetch('http://localhost:5002/api/web_cart', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${webtoken}`
-            },
-            body: JSON.stringify(productData),
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.text().then(text => {
-                    console.error('Error response:', text);
-                    throw new Error(text || 'Network response was not ok');
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Product added to cart:', data);
-            let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            const existingItemIndex = cart.findIndex(item => item.productId === product._id);
-            
-            const cartItem = {
-                productId: product._id,
-                name: product.name,
-                price: productData.product_price,
-                quantity: quantity,
-                image: product.image
-            };
-            
-            if (existingItemIndex > -1) {
-                cart[existingItemIndex].quantity += quantity;
-            } else {
-                cart.push(cartItem);
-            }
-            
-            localStorage.setItem('cart', JSON.stringify(cart));
-            alert('Product added to cart!');
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error occurred while adding the product to the cart: ' + error.message);
-        });
-    }
+    async function fetchRelatedProducts(parentCategory) {
+        try {
+            const response = await fetch(`http://localhost:5002/api/productweb?parent_category=${encodeURIComponent(parentCategory)}`);
 
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.success && data.products && data.products.length > 0) {
+                const currentProductId = new URLSearchParams(window.location.search).get('id');
+                const relatedProducts = data.products.filter(product => product._id !== currentProductId);
+
+                displayRelatedProducts(relatedProducts);
+            } else {
+                console.warn('No related products found');
+            }
+        } catch (error) {
+            console.error('Error fetching related products:', error);
+        }
+    }
 
     function displayRelatedProducts(products) {
         const relatedProductsContainer = document.querySelector('.new-arrival__slider');
@@ -466,7 +384,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                        
                         <button onclick="window.location.href='product-details.html?id=${product._id}'" 
-                            class="product-card__cart btn bg-main-50 text-main-600 hover-bg-main-600 hover-text-white py-11 px-24 rounded-pill flex-align gap-8 mt-24 w-100 justify-content-center" data-product-id="${product._id}" data-product-price="${currentPrice}" data-product-discount="${originalPrice}" data-product-currencycode="${currencyCode}" data-product-quantity="1" onclick="handleAddToCart(product)">
+                            class="product-card__cart btn bg-main-50 text-main-600 hover-bg-main-600 hover-text-white py-11 px-24 rounded-pill flex-align gap-8 mt-24 w-100 justify-content-center" data-product-id="${product._id}" data-product-price="${currentPrice}" data-product-discount="${originalPrice}" data-product-currencycode="${currencyCode}" data-product-quantity="1" onClick="handleAddToCart(event)">
                             Add To Cart <i class="ph ph-shopping-cart"></i>
                         </button>
                     </div>
@@ -540,31 +458,104 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 100);
     }
 
-    // Rest of the fetchRelatedProducts function remains the same
-    async function fetchRelatedProducts(parentCategory) {
-        try {
-            const response = await fetch(`http://localhost:5002/api/productweb?parent_category=${encodeURIComponent(parentCategory)}`);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            if (data.success && data.products && data.products.length > 0) {
-                const currentProductId = new URLSearchParams(window.location.search).get('id');
-                const relatedProducts = data.products.filter(product => product._id !== currentProductId);
-
-                displayRelatedProducts(relatedProducts);
-            } else {
-                console.warn('No related products found');
-            }
-        } catch (error) {
-            console.error('Error fetching related products:', error);
-        }
-    }
     // Initialize the page
     fetchProductDetails();
 });
 
 
+function handleAddToCart(productOrEvent) {
+    const webtoken = localStorage.getItem('webtoken');
+    if (!webtoken) {
+        alert('Please login first');
+        window.location.href = "account.html";
+        return;
+    }
+
+    let productData;
+
+    if (productOrEvent && productOrEvent.preventDefault) {
+        productOrEvent.preventDefault();
+        const button = productOrEvent.target.closest('button, a');
+        if (!button) {
+            console.error('Unable to find the button element.');
+            return;
+        }
+
+        productData = {
+            productId: button.getAttribute('data-product-id'),
+            product_currecy_code: button.getAttribute('data-product-currencycode'),
+            product_quantity: parseInt(button.getAttribute('data-product-quantity') || 1, 10),
+            product_price: parseFloat(button.getAttribute('data-product-price')),
+            product_discount: parseFloat(button.getAttribute('data-product-discount'))
+        };
+    } else {
+        // It's a product object
+        const product = productOrEvent;
+        if (!product) {
+            console.error('No product data available');
+            return;
+        }
+
+        // Get quantity from input if available
+        const quantityInput = document.querySelector('.quantity__input');
+        const quantity = parseInt(quantityInput?.value) || 1;
+
+        // Find AED pricing or default to first pricing option
+        const aedPricing = product.country_pricing?.find(p => p.currency_code === 'AED') ||
+            product.country_pricing?.[0];
+
+        if (!aedPricing) {
+            console.error('No pricing information available');
+            alert('Unable to add product to cart: Missing pricing information');
+            return;
+        }
+
+        productData = {
+            productId: product._id,
+            product_currecy_code: aedPricing.currency_code,
+            product_quantity: quantity,
+            product_price: aedPricing.discount || product.price,
+            product_discount: aedPricing.unit_price || (product.price * 1.5)
+        };
+    }
+
+    // Update button state if it exists
+    const addToCartButton = document.querySelector('.add-to-cart-btn');
+    if (addToCartButton) {
+        addToCartButton.disabled = true;
+        addToCartButton.textContent = 'Adding...';
+    }
+
+    // Make the API call
+    fetch('http://localhost:5002/api/web_cart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${webtoken}`
+        },
+        body: JSON.stringify(productData),
+    })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(text || 'Network response was not ok');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Product added to cart:', data);
+            alert('Product added to cart successfully!');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error adding product to cart: ' + error.message);
+        })
+        .finally(() => {
+            // Reset button state
+            if (addToCartButton) {
+                addToCartButton.disabled = false;
+                addToCartButton.textContent = 'Add to Cart';
+            }
+        });
+}
