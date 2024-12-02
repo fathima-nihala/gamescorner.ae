@@ -1,6 +1,6 @@
 
 class BrandManager {
-  constructor(apiBaseUrl = "http://localhost:5000/api") {
+  constructor(apiBaseUrl = "https://api.gamescorner.ae/api") {
     this.apiBaseUrl = apiBaseUrl;
 
     // DOM Element References
@@ -12,24 +12,21 @@ class BrandManager {
     this.loadingIndicator = document.getElementById("loadingIndicator");
     this.errorMessage = document.getElementById("errorMessage");
 
-    // Bind methods to preserve context
     this.fetchBrands = this.fetchBrands.bind(this);
     this.populateBrandsTable = this.populateBrandsTable.bind(this);
     this.initSlider = this.initSlider.bind(this);
 
-    // Add event listeners
     this.addEventListeners();
   }
 
   addEventListeners() {
-    // Event listeners for search
     if (this.searchBtn) {
       this.searchBtn.addEventListener("click", () => {
         const query = this.searchInput.value.trim();
         this.fetchBrands(query);
       });
     }
-  
+
     if (this.searchInput) {
       let debounceTimer;
       this.searchInput.addEventListener("input", () => {
@@ -37,37 +34,36 @@ class BrandManager {
         debounceTimer = setTimeout(() => {
           const query = this.searchInput.value.trim();
           this.fetchBrands(query);
-        }, 300); // 300ms delay
+        }, 300);
       });
     }
   }
 
-  // Fetch brands from the API
   async fetchBrands(query = "") {
     try {
       if (this.loadingIndicator) {
         this.loadingIndicator.style.display = "block";
       }
-  
+
       if (this.errorMessage) {
         this.errorMessage.textContent = "";
       }
-  
+
       let url = `${this.apiBaseUrl}/brand`;
       if (query) {
         url += `?name=${encodeURIComponent(query)}`;
       }
-  
+
       console.log("Fetching brands from URL:", url);
-  
+
       const response = await fetch(url);
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-  
+
       const data = await response.json();
-  
+
       if (data.success) {
         if (!data.brands || data.brands.length === 0) {
           console.warn("Brands array is empty");
@@ -80,7 +76,7 @@ class BrandManager {
       }
     } catch (error) {
       console.error("Detailed error fetching brands:", error);
-  
+
       if (this.errorMessage) {
         this.errorMessage.textContent = `Error: ${error.message}`;
       }
@@ -97,7 +93,7 @@ class BrandManager {
       console.warn("Brands table body not found");
       return;
     }
-  
+
     // Destroy existing Slick slider if it exists
     if ($(this.brandsTableBody).hasClass('slick-initialized')) {
       $(this.brandsTableBody).slick('unslick');
@@ -105,7 +101,7 @@ class BrandManager {
 
     // Clear previous content
     this.brandsTableBody.innerHTML = "";
-  
+
     if (!brands || brands.length === 0) {
       const row = document.createElement("div");
       row.textContent = "No brands found";
@@ -118,13 +114,14 @@ class BrandManager {
       try {
         const brandItem = document.createElement("div");
         brandItem.classList.add("brand-item");
-        
+
         const imageSrc = brand.image || "assets/images/thumbs/brand1.png";
-        
+
         brandItem.innerHTML = `
+        <a href="shop.html?brand=${brand._id}" class="brand-link">
           <img src="${imageSrc}" alt="${brand.name || 'Brand'}">
-        `;
-        
+        </a>        `;
+
         this.brandsTableBody.appendChild(brandItem);
       } catch (error) {
         console.error(`Error processing brand`, error);
@@ -143,65 +140,65 @@ class BrandManager {
     }
 
     $(this.brandsTableBody).slick({
-    slidesToShow: 8,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 2000,
-    speed: 1500,
-    dots: false,
-    pauseOnHover: true,
-    arrows: true,
-    draggable: true,
-    rtl: $('html').attr('dir') === 'rtl' ? true : false,
-    speed: 900,
-    infinite: true,
-    nextArrow: '#brand-next',
-    prevArrow: '#brand-prev',
-    responsive: [
-      {
-        breakpoint: 1599,
-        settings: {
-          slidesToShow: 7,
-          arrows: false,
-        }
-      },
-      {
-        breakpoint: 1399,
-        settings: {
-          slidesToShow: 6,
-          arrows: false,
-        }
-      },
-      {
-        breakpoint: 992,
-        settings: {
-          slidesToShow: 5,
-          arrows: false,
-        }
-      },
-      {
-        breakpoint: 575,
-        settings: {
-          slidesToShow: 4,
-          arrows: false,
-        }
-      },
-      {
-        breakpoint: 424,
-        settings: {
-          slidesToShow: 3,
-          arrows: false,
-        }
-      },
-      {
-        breakpoint: 359,
-        settings: {
-          slidesToShow: 2,
-          arrows: false,
-        }
-      },
-    ]
-  });  
+      slidesToShow: 8,
+      slidesToScroll: 1,
+      autoplay: true,
+      autoplaySpeed: 2000,
+      speed: 1500,
+      dots: false,
+      pauseOnHover: true,
+      arrows: true,
+      draggable: true,
+      rtl: $('html').attr('dir') === 'rtl' ? true : false,
+      speed: 900,
+      infinite: true,
+      nextArrow: '#brand-next',
+      prevArrow: '#brand-prev',
+      responsive: [
+        {
+          breakpoint: 1599,
+          settings: {
+            slidesToShow: 7,
+            arrows: false,
+          }
+        },
+        {
+          breakpoint: 1399,
+          settings: {
+            slidesToShow: 6,
+            arrows: false,
+          }
+        },
+        {
+          breakpoint: 992,
+          settings: {
+            slidesToShow: 5,
+            arrows: false,
+          }
+        },
+        {
+          breakpoint: 575,
+          settings: {
+            slidesToShow: 4,
+            arrows: false,
+          }
+        },
+        {
+          breakpoint: 424,
+          settings: {
+            slidesToShow: 3,
+            arrows: false,
+          }
+        },
+        {
+          breakpoint: 359,
+          settings: {
+            slidesToShow: 2,
+            arrows: false,
+          }
+        },
+      ]
+    });
   }
 
   // Initialize the component

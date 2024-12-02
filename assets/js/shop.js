@@ -10,9 +10,22 @@ class ProductListing {
             subCategory: '',
             brand: ''
         };
-
         this.initEventListeners();
         this.fetchInitialData();
+        this.parseUrlParameters();
+    }
+
+    parseUrlParameters() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoryId = urlParams.get('category');
+        const brandId = urlParams.get('brand');
+
+        if (categoryId) {
+            this.pendingCategorySelection = categoryId;
+        }
+        if (brandId) {
+            this.pendingBrandSelection = brandId;
+        }
     }
 
     async fetchInitialData() {
@@ -68,11 +81,50 @@ class ProductListing {
             if (data.success && data.categories) {
                 this.renderParentCategories(data.categories);
                 this.renderSubCategories(data.categories);
+
+                if (this.pendingCategorySelection) {
+                    this.selectCategoryFromId(data.categories, this.pendingCategorySelection);
+                }
             }
         } catch (error) {
             console.error('Error fetching categories:', error);
             this.showError('categoryList');
             this.showError('parentcat_list');
+        }
+    }
+
+    selectCategoryFromId(categories, categoryId) {
+        const parentCategory = categories.find(cat => cat._id === categoryId);
+        if (parentCategory) {
+            const parentRadio = document.getElementById(`parentcategory-${categoryId}`);
+            if (parentRadio) {
+                parentRadio.checked = true;
+                this.selectedFilters.parentCategory = categoryId;
+                this.fetchProducts();
+                return;
+            }
+        }
+    
+        for (const category of categories) {
+            if (category.name && Array.isArray(category.name)) {
+                const subCategory = category.name.find(sub => sub._id === categoryId);
+                if (subCategory) {
+                    const parentRadio = document.getElementById(`parentcategory-${category._id}`);
+                    if (parentRadio) {
+                        parentRadio.checked = true;
+                        this.selectedFilters.parentCategory = category._id;
+                    }
+    
+                    const subRadio = document.getElementById(`subcategory-${categoryId}`);
+                    if (subRadio) {
+                        subRadio.checked = true;
+                        this.selectedFilters.subCategory = categoryId;
+                    }
+    
+                    this.fetchProducts();
+                    return;
+                }
+            }
         }
     }
 
@@ -83,10 +135,54 @@ class ProductListing {
 
             if (data.success && data.brands) {
                 this.renderBrands(data.brands);
+
+                if (this.pendingBrandSelection) {
+                    this.selectBrandFromId(data.brands, this.pendingBrandSelection);
+                }
             }
         } catch (error) {
             console.error('Error fetching brands:', error);
             this.showError('brandList');
+        }
+    }
+
+    selectBrandFromId(brands, brandId) {
+        const brand = brands.find(b => b._id === brandId);
+        if (brand) {
+            const brandRadio = document.getElementById(`brand-${brandId}`);
+            if (brandRadio) {
+                brandRadio.checked = true;
+                this.selectedFilters.brand = brandId;
+                this.fetchProducts();
+            }
+        }
+    }
+
+    renderBrands(brands) {
+        const brandList = document.getElementById('brandList');
+        if (!brandList) return;
+
+        brandList.innerHTML = brands.map(brand => `
+            <li class="mb-24">
+                <div class="form-check common-check common-radio">
+                    <input type="radio" name="brand" 
+                           id="brand-${brand._id}" 
+                           value="${brand._id}" 
+                           class="form-check-input">
+                    <label class="form-check-label" for="brand-${brand._id}">
+                        ${brand.name || 'Unnamed Brand'}
+                    </label>
+                </div>
+            </li>
+        `).join('');
+
+        if (this.pendingBrandSelection) {
+            const brandRadio = document.getElementById(`brand-${this.pendingBrandSelection}`);
+            if (brandRadio) {
+                brandRadio.checked = true;
+                this.selectedFilters.brand = this.pendingBrandSelection;
+                this.fetchProducts();
+            }
         }
     }
 

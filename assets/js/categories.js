@@ -1,5 +1,5 @@
 class CategoryManager {
-  constructor(apiBaseUrl = "http://localhost:5000/api") {
+  constructor(apiBaseUrl = "https://api.gamescorner.ae/api") {
     this.apiBaseUrl = apiBaseUrl;
 
     // Bind the method to preserve context
@@ -137,11 +137,7 @@ class CategoryManager {
       }
 
       console.log("Fetch URL:", url);
-
-      // Show loading indicator
       this.loadingIndicator.style.display = "block";
-
-      // Clear the categories list and error message
       this.categoriesList.innerHTML = "";
       this.errorMessage.textContent = "";
 
@@ -167,7 +163,7 @@ class CategoryManager {
   // Render categories in the list
   async fetchAndRenderCategories() {
     try {
-      const categories = await this.fetchCategories(); // Fetch categories from API
+      const categories = await this.fetchCategories(); 
 
       if (!categories || categories.length === 0) {
         this.categoriesList.innerHTML = `
@@ -177,22 +173,23 @@ class CategoryManager {
         return;
       }
 
-      this.categoriesList.innerHTML = ""; // Clear previous items
+      this.categoriesList.innerHTML = "";       
 
       categories.forEach((category) => {
-        const { parent_category, name, icon } = category;
+        const { parent_category, name, icon, _id: parentId  } = category;
 
-        // Create main menu item for the parent_category
         const mainMenuItem = document.createElement("li");
         mainMenuItem.classList.add("has-submenus-submenu");
-
         const menuLink = document.createElement("a");
-        menuLink.href = "javascript:void(0)";
+        menuLink.href = name && name.length > 0 
+        ? "javascript:void(0)" 
+        : `shop.html?category=${parentId}`;
+
         menuLink.className =
           "text-gray-500 text-15 py-12 px-16 flex-align gap-8 rounded-0";
         menuLink.innerHTML = `
                 <span class="text-xl d-flex">
-                    <img src="${icon}" alt="${parent_category} Icon" class="w-14 h-14">
+                    <img src="${icon}" alt="${parent_category} Icon" class="w-20 h-20">
                 </span>
                 <span>${parent_category}</span>
                 ${
@@ -220,9 +217,10 @@ class CategoryManager {
             "submenus-submenu__list max-h-300 overflow-y-auto scroll-sm";
 
           name.forEach((subcategory) => {
+            
             const subMenuItem = document.createElement("li");
             const subMenuLink = document.createElement("a");
-            subMenuLink.href = "shop.html";
+            subMenuLink.href = `shop.html?category=${subcategory._id}`;
             subMenuLink.textContent = subcategory.value;
 
             subMenuItem.appendChild(subMenuLink);
@@ -249,11 +247,9 @@ class CategoryManager {
       return name;
     }
     if (Array.isArray(name)) {
-      // Use arrow function to preserve context or bind the method
       return name.map((n) => this.extractCategoryName(n)).join(", ");
     }
     if (typeof name === "object" && name !== null) {
-      // Use arrow function or bind to preserve context
       return Object.values(name)
         .map((n) => this.extractCategoryName(n))
         .join(", ");
@@ -261,35 +257,27 @@ class CategoryManager {
     return "Unnamed Category";
   }
 
-  // Method to remove object ID from category name
   removeCategoryId(name) {
-    // Remove any patterns like [123] or (456) from the end of the string
     return name.replace(/\s*[\[\(]\d+[\]\)]$/, "").trim();
   }
 
-  // Handle errors
   handleError(error) {
     console.error("Error:", error);
     this.errorMessage.textContent = `Error: ${error.message}`;
     this.errorMessage.style.display = "block";
   }
 
-  // Initialize the category manager
   init() {
     this.fetchAndRenderCategories();
-
-    // Optional: Add a back button to return to previous level
     const backButton = document.getElementById("backButton");
     if (backButton) {
       backButton.addEventListener("click", () => {
         if (this.categoryStack.length > 1) {
-          // Remove the current category and go back to previous
           this.categoryStack.pop();
           const previousCategory =
             this.categoryStack[this.categoryStack.length - 1];
           this.fetchAndRenderCategories(previousCategory);
         } else {
-          // If at root, reset to initial state
           this.resetToRootCategories();
         }
       });

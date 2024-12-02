@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to fetch coupon data
     async function fetchFlashSales() {
         try {
-            const response = await fetch('http://localhost:5000/api/couponweb');
+            const response = await fetch('http://localhost:5002/api/couponweb');
             const data = await response.json();
             
             if (data.success && data.coupons.length > 0) {

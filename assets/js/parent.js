@@ -1,13 +1,13 @@
 
 class ParentImageManager {
-  constructor(apiBaseUrl = "http://localhost:5000/api") {
+  constructor(apiBaseUrl = "https://api.gamescorner.ae/api") {
     this.apiBaseUrl = apiBaseUrl;
 
     // DOM Element References
     this.parentTableBody = document.getElementById("parentTableBody");
     this.searchInput = document.getElementById("searchInput");
     this.searchBtn = document.getElementById("searchBtn");
-    this.loadingIndicator = document.getElementById("loadingIndicator");
+    this.loadingIndicator = document.getElementById("loadingIndicator");  
     this.errorMessage = document.getElementById("errorMessage");
 
     // Bind methods to preserve context
@@ -106,7 +106,7 @@ class ParentImageManager {
       categoryItem.innerHTML = `
         <div class="feature-item__thumb rounded-circle">
           <a href="shop.html?id=${category._id}" class="w-100 h-100 flex-center">
-            <img src="${imageSrc}" alt="${name}" class="parentcat-img">
+            <img src="${imageSrc}" alt="${name}" class="parentcat-img" style="object-fit: contain; ">
           </a>
         </div>
         <div class="feature-item__content mt-16">
