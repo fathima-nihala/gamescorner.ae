@@ -17,7 +17,8 @@ class ProductListing {
 
     parseUrlParameters() {
         const urlParams = new URLSearchParams(window.location.search);
-        const categoryId = urlParams.get('category');
+        // const categoryId = urlParams.get('category');
+        const categoryId = urlParams.get('id') || urlParams.get('category');
         const brandId = urlParams.get('brand');
 
         if (categoryId) {
