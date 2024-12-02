@@ -69,7 +69,6 @@ class ParentImageManager {
     }
   }
 
-  
   // Populate parent categories table
   populateParentTable(categories) {
     if (!this.parentTableBody) {
@@ -203,7 +202,6 @@ class ParentImageManager {
   }
 }
 
-// Initialize when DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
   const parentImageManager = new ParentImageManager();
   parentImageManager.init();
