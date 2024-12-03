@@ -1,14 +1,17 @@
-// cart.js
-
 class CartManager {
     constructor() {
+        // Main cart elements
         this.cartTableBody = document.querySelector('.table tbody');
-        this.subtotalElement = document.querySelector('[data-subtotal]');
-        this.taxElement = document.querySelector('[data-tax]');
-        this.shippingElement = document.querySelector('[data-shipping]');
-        this.totalElement = document.querySelector('[data-total]');
-        this.productCountElement = document.querySelector('[data-product-count]');
-        
+        this.cartSidebar = document.querySelector('.cart-sidebar');
+
+        // Form elements
+        this.couponInput = document.querySelector('.common-input');
+        this.applyCouponButton = document.querySelector('.btn.btn-main');
+        this.updateCartButton = document.querySelector('.text-lg.text-gray-500');
+
+        // API configuration
+        this.baseApiUrl = 'http://localhost:5002/api';
+
         this.initialize();
     }
 
@@ -18,187 +21,344 @@ class CartManager {
             this.setupEventListeners();
         } catch (error) {
             console.error('Failed to initialize cart:', error);
+            this.renderErrorState(error);
         }
+    }
+
+    setupEventListeners() {
+        // Coupon application
+        if (this.applyCouponButton && this.couponInput) {
+            this.applyCouponButton.addEventListener('click', () => {
+                const couponCode = this.couponInput.value.trim();
+                if (couponCode) {
+                    this.applyCoupon(couponCode);
+                } else {
+                    alert("Please enter a coupon code.");
+                }
+            });
+        }
+
+        // Update cart button
+        if (this.updateCartButton) {
+            this.updateCartButton.addEventListener('click', () => {
+                this.updateAllQuantities();
+            });
+        }
+
+        // Quantity controls - Rewritten to be more precise
+        document.querySelectorAll('.quantity__minus_cart').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const input = e.target.closest('.d-flex').querySelector('.quantity__input');
+                if (input) {
+                    const currentValue = parseInt(input.value) || 1;
+                    input.value = Math.max(1, currentValue - 1);
+                    this.updateProductSubtotal(input);
+                }
+            });
+        });
+
+        document.querySelectorAll('.quantity__plus_cart').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const input = e.target.closest('.d-flex').querySelector('.quantity__input');
+                if (input) {
+                    const currentValue = parseInt(input.value) || 1;
+                    input.value = currentValue + 1;
+                    this.updateProductSubtotal(input);
+                }
+            });
+        });
+
+        // Direct input change event
+        document.querySelectorAll('.quantity__input').forEach(input => {
+            input.addEventListener('change', (e) => {
+                const value = parseInt(e.target.value) || 1;
+                e.target.value = Math.max(1, value);
+                this.updateProductSubtotal(input);
+            });
+        });
+
+        // Remove item buttons
+        document.querySelectorAll('.remove-tr-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const row = e.target.closest('tr');
+                const productId = this.getProductIdFromRow(row);
+                if (productId) {
+                    this.removeItem(productId);
+                }
+            });
+        });
+    }
+
+    // New method to update product subtotal
+    updateProductSubtotal(quantityInput) {
+        const row = quantityInput.closest('tr');
+        const priceElement = row.querySelector('td:nth-child(3) .h6');
+        const productPrice = parseFloat(priceElement.textContent.replace('AED: ', '')) || 0;
+        const quantity = parseInt(quantityInput.value) || 1;
+        
+        const subtotalElement = row.querySelector('td:nth-child(5) .h6');
+        const subtotal = (productPrice * quantity).toFixed(2);
+        
+        subtotalElement.textContent = `AED ${subtotal}`;
+    }
+
+    getProductIdFromRow(row) {
+        const productLink = row.querySelector('.table-product__content .title a');
+        return productLink?.getAttribute('data-product-id');
     }
 
     async fetchCartData() {
         try {
-            const response = await fetch('http://localhost:5002/api/web_cart?currency_code=AED', {
+            const token = localStorage.getItem('webtoken');
+            if (!token) throw new Error('User is not authenticated.');
+
+            const response = await fetch(`${this.baseApiUrl}/web_cart?currency_code=AED`, {
                 method: 'GET',
-                credentials: 'include',
                 headers: {
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
 
             if (!response.ok) {
-                throw new Error('Failed to fetch cart data');
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
 
             const data = await response.json();
-            this.renderCart(data);
+
+            if (data.success && data.cart) {
+                this.renderCart(data.cart);
+            } else {
+                this.renderEmptyCart();
+            }
         } catch (error) {
             console.error('Error fetching cart data:', error);
+            this.renderErrorState(error);
         }
     }
 
-    renderCart(data) {
-        if (!data.success || !data.cart) {
-            console.error('Invalid cart data');
-            return;
+    renderCart(cartData) {
+        if (!cartData) return this.renderEmptyCart();
+
+        // Render products in cart table
+        if (this.cartTableBody && cartData.products) {
+            this.cartTableBody.innerHTML = cartData.products
+                .map(product => this.generateProductRow(product))
+                .join('');
         }
 
-        // Clear existing cart items
-        this.cartTableBody.innerHTML = '';
-
-        // Render each product
-        data.cart.products.forEach(item => {
-            const productHtml = this.createProductHtml(item);
-            this.cartTableBody.insertAdjacentHTML('beforeend', productHtml);
-        });
-
-        // Update summary
-        this.updateCartSummary({
-            subtotal: data.totalProductPrice,
-            tax: data.totalTax,
-            shipping: data.totalShippingPrice,
-            total: data.totalProductPrice + data.totalTax + data.totalShippingPrice - data.totalProductDiscount
-        });
-    }
-
-    createProductHtml(item) {
-        const product = item.product;
-        return `
-            <tr data-product-id="${product._id}">
-                <td>
-                    <button type="button" class="remove-tr-btn flex-align gap-12 hover-text-danger-600">
-                        <i class="ph ph-x-circle text-2xl d-flex"></i>
-                        Remove
-                    </button>
-                </td>
-                <td>
-                    <div class="table-product d-flex align-items-center gap-24">
-                        <a href="product-details-two.html" class="table-product__thumb border border-gray-100 rounded-8 flex-center">
-                            <img src="${product.image}" alt="${product.name}">
-                        </a>
-                        <div class="table-product__content text-start">
-                            <h6 class="title text-lg fw-semibold mb-8">
-                                <a href="product-details.html" class="link text-line-2">${product.name}</a>
-                            </h6>
-                        </div>
+        // Render cart totals in sidebar
+        if (this.cartSidebar) {
+            const totalsHtml = `
+                <div class="cart-totals p-24 bg-color-three rounded-8 mb-24">
+                    <div class="mb-32 flex-between gap-8">
+                        <span class="text-gray-900 font-heading-two">Subtotal</span>
+                        <span class="text-gray-900 fw-semibold">AED ${cartData.totalProductPrice?.toFixed(2) || '0.00'}</span>
                     </div>
-                </td>
-                <td>
-                    <span class="text-lg h6 mb-0 fw-semibold">${item.product_currecy_code} ${item.product_price.toFixed(2)}</span>
-                </td>
-                <td>
-                    <div class="d-flex rounded-4 overflow-hidden">
-                        <button type="button" class="quantity__minus border border-end border-gray-100 flex-shrink-0 h-48 w-48 text-neutral-600 flex-center hover-bg-main-600 hover-text-white">
+                    <div class="mb-32 flex-between gap-8">
+                        <span class="text-gray-900 font-heading-two">Estimated Delivery</span>
+                        <span class="text-gray-900 fw-semibold">AED ${cartData.totalShippingPrice?.toFixed(2) || '0.00'}</span>
+                    </div>
+                    <div class="mb-0 flex-between gap-8">
+                        <span class="text-gray-900 font-heading-two">Estimated Tax</span>
+                        <span class="text-gray-900 fw-semibold">AED ${cartData.totalTax?.toFixed(2) || '0.00'}</span>
+                    </div>
+                </div>
+                <div class="p-24 bg-color-three rounded-8">
+                    <div class="flex-between gap-8">
+                        <span class="text-gray-900 text-xl fw-semibold">Total</span>
+                        <span class="text-gray-900 text-xl fw-semibold">AED ${(
+                    (cartData.totalProductPrice || 0) +
+                    (cartData.totalShippingPrice || 0) +
+                    (cartData.totalTax || 0) -
+                    (cartData.totalProductDiscount || 0)
+                ).toFixed(2)}</span>
+                    </div>
+                </div>
+            `;
+            this.cartSidebar.innerHTML = totalsHtml;
+        }
+
+        this.setupEventListeners();
+    }
+
+    generateProductRow(product) {
+        if (!product?.product) return '';
+
+        function truncateText(text, wordLimit) {
+            const words = text.split(' ');
+            return words.length > wordLimit ? words.slice(0, wordLimit).join(' ') + '...' : text;
+        }
+
+        return `
+            <tr>
+             <td>
+               <button type="button"
+                class="remove-tr-btn flex-align gap-12 hover-text-danger-600">
+                <i class="ph ph-x-circle text-2xl d-flex"></i>Remove</button>
+             </td>
+             <td>
+              <div class="table-product d-flex align-items-center gap-24">
+                <a href="product-details.html?${product._id}"
+                  class="table-product__thumb border border-gray-100 rounded-8 flex-center ">
+                    <img src="${product.product.image || ''}" alt="">
+                 </a>
+                  <div class="table-product__content text-start">
+                    <h6 class="title text-lg fw-semibold mb-8">
+                        <a href="product-details.html?${product._id}" class="link text-line-2"
+                          tabindex="0">${truncateText(product.product.name || '', 4)}</a>
+                    </h6>
+                  </div>
+              </div>
+            </td>
+             <td>
+               <span class="text-lg h6 mb-0 fw-semibold">AED: ${product.product_discount}</span>
+             </td>
+             <td>
+                <div class="d-flex rounded-4 overflow-hidden">
+                        <button type="button" class="quantity__minus_cart border border-end border-gray-100 flex-shrink-0 h-48 w-48 text-neutral-600 flex-center hover-bg-main-600 hover-text-white">
                             <i class="ph ph-minus"></i>
                         </button>
-                        <input type="number" class="quantity__input flex-grow-1 border border-gray-100 border-start-0 border-end-0 text-center w-32 px-4"
-                            value="${item.product_quantity}" min="1" data-product-id="${product._id}">
-                        <button type="button" class="quantity__plus border border-end border-gray-100 flex-shrink-0 h-48 w-48 text-neutral-600 flex-center hover-bg-main-600 hover-text-white">
+                        <input type="number" class="quantity__input flex-grow-1 border border-gray-100 border-start-0 border-end-0 text-center w-32 px-4" value="${product.product_quantity || 1}" min="1">
+                        <button type="button" class="quantity__plus_cart border border-end border-gray-100 flex-shrink-0 h-48 w-48 text-neutral-600 flex-center hover-bg-main-600 hover-text-white">
                             <i class="ph ph-plus"></i>
                         </button>
-                    </div>
-                </td>
-                <td>
-                    <span class="text-lg h6 mb-0 fw-semibold">${item.product_currecy_code} ${(item.product_price * item.product_quantity).toFixed(2)}</span>
-                </td>
-            </tr>
+                 </div>
+            </td>
+            <td>
+                <span class="text-lg h6 mb-0 fw-semibold">AED ${((product.product_discount || 0) * (product.product_quantity || 0)).toFixed(2)}</span>
+            </td>
+          </tr>
         `;
-    }
-
-    updateCartSummary({ subtotal, tax, shipping, total }) {
-        if (this.subtotalElement) {
-            this.subtotalElement.textContent = `AED ${subtotal.toFixed(2)}`;
-        }
-        if (this.taxElement) {
-            this.taxElement.textContent = `AED ${tax.toFixed(2)}`;
-        }
-        if (this.shippingElement) {
-            this.shippingElement.textContent = shipping === 0 ? 'Free' : `AED ${shipping.toFixed(2)}`;
-        }
-        if (this.totalElement) {
-            this.totalElement.textContent = `AED ${total.toFixed(2)}`;
-        }
-    }
-
-    setupEventListeners() {
-        // Remove item
-        this.cartTableBody.addEventListener('click', (e) => {
-            if (e.target.closest('.remove-tr-btn')) {
-                const row = e.target.closest('tr');
-                const productId = row.dataset.productId;
-                this.removeItem(productId);
-            }
-        });
-
-        // Quantity changes
-        this.cartTableBody.addEventListener('click', (e) => {
-            const button = e.target.closest('.quantity__minus, .quantity__plus');
-            if (!button) return;
-
-            const input = button.parentElement.querySelector('.quantity__input');
-            const productId = input.dataset.productId;
-            const currentValue = parseInt(input.value);
-
-            if (button.classList.contains('quantity__minus')) {
-                if (currentValue > 1) {
-                    input.value = currentValue - 1;
-                    this.updateQuantity(productId, currentValue - 1);
-                }
-            } else {
-                input.value = currentValue + 1;
-                this.updateQuantity(productId, currentValue + 1);
-            }
-        });
     }
 
     async removeItem(productId) {
         try {
-            const response = await fetch(`http://localhost:5002/api/remove_cart_item/${productId}`, {
+            const token = localStorage.getItem('webtoken');
+            const response = await fetch(`${this.baseApiUrl}/cart/remove/${productId}`, {
                 method: 'DELETE',
-                credentials: 'include'
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
             });
 
-            if (response.ok) {
-                await this.fetchCartData(); // Refresh cart data
-            } else {
-                console.error('Failed to remove item');
+            if (!response.ok) {
+                throw new Error('Failed to remove item');
             }
+
+            await this.fetchCartData();
         } catch (error) {
             console.error('Error removing item:', error);
+            alert('Failed to remove item from cart');
         }
     }
 
-    async updateQuantity(productId, quantity) {
+    async updateAllQuantities() {
         try {
-            const response = await fetch(`http://localhost:5002/api/update_cart_quantity`, {
-                method: 'PUT',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    productId,
-                    quantity
-                })
+            const updates = [];
+            document.querySelectorAll('.quantity__input').forEach(input => {
+                const row = input.closest('tr');
+                const productId = this.getProductIdFromRow(row);
+                if (productId) {
+                    updates.push({
+                        productId,
+                        quantity: parseInt(input.value) || 1
+                    });
+                }
             });
 
-            if (response.ok) {
-                await this.fetchCartData(); // Refresh cart data
-            } else {
-                console.error('Failed to update quantity');
+            const token = localStorage.getItem('webtoken');
+            const response = await fetch(`${this.baseApiUrl}/cart/update-batch`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ updates })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update quantities');
             }
+
+            await this.fetchCartData();
         } catch (error) {
-            console.error('Error updating quantity:', error);
+            console.error('Error updating quantities:', error);
+            alert('Failed to update cart quantities');
+        }
+    }
+
+    async applyCoupon(couponCode) {
+        try {
+            const token = localStorage.getItem('webtoken');
+            const response = await fetch(`${this.baseApiUrl}/cart/apply-coupon`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ couponCode })
+            });
+
+            if (!response.ok) {
+                throw new Error('Invalid coupon code');
+            }
+
+            await this.fetchCartData();
+            alert('Coupon applied successfully');
+        } catch (error) {
+            console.error('Error applying coupon:', error);
+            alert('Failed to apply coupon');
+        }
+    }
+
+    renderEmptyCart() {
+        if (this.cartTableBody) {
+            this.cartTableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center py-32">
+                        <h4 class="mb-8">Your cart is empty</h4>
+                        <p class="text-gray-500">Add items to your cart to continue shopping</p>
+                    </td>
+                </tr>
+            `;
+        }
+
+        if (this.cartSidebar) {
+            this.cartSidebar.innerHTML = `
+                <div class="text-center py-32">
+                    <h6 class="text-xl mb-8">Cart Totals</h6>
+                    <p class="text-gray-500">No items in cart</p>
+                </div>
+            `;
+        }
+    }
+
+    renderErrorState(error) {
+        if (this.cartTableBody) {
+            this.cartTableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center py-32">
+                        <h4 class="mb-8">Error loading cart</h4>
+                        <p class="text-danger-600">${error.message}</p>
+                    </td>
+                </tr>
+            `;
+        }
+
+        if (this.cartSidebar) {
+            this.cartSidebar.innerHTML = `
+                <div class="text-center py-32">
+                    <h6 class="text-xl mb-8">Cart Totals</h6>
+                    <p class="text-danger-600">Failed to load cart data</p>
+                </div>
+            `;
         }
     }
 }
 
-// Initialize cart manager when DOM is loaded
+// Initialize cart manager when DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     new CartManager();
 });

@@ -117,7 +117,6 @@ class CategoryManager {
   // Fetch categories from the backend
   async fetchCategories(parentCategory = "", searchTerm = "") {
     try {
-      console.log("Fetching categories with parent:", parentCategory);
 
       // Construct URL with optional parent category and search filter
       let url = `${this.apiBaseUrl}/category`;
@@ -136,7 +135,6 @@ class CategoryManager {
         url += `?${params.toString()}`;
       }
 
-      console.log("Fetch URL:", url);
       this.loadingIndicator.style.display = "block";
       this.categoriesList.innerHTML = "";
       this.errorMessage.textContent = "";
@@ -148,7 +146,6 @@ class CategoryManager {
       }
 
       const data = await response.json();
-      console.log("Fetched categories data:", data);
 
       return data.categories || [];
     } catch (error) {
@@ -287,7 +284,6 @@ class CategoryManager {
 
 // Initialize when DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("DOM fully loaded. Initializing CategoryManager.");
   const categoryManager = new CategoryManager();
   categoryManager.init();
 });
