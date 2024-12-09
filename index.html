@@ -9,6 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/jquery"></script>
     <script src="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.min.js"></script>
 
+
     <!-- Title -->
     <title>Games corner</title>
     <!-- Favicon -->
@@ -147,38 +148,38 @@
                 <!-- Logo End  -->
 
                 <!-- form location Start -->
-                <form action="#" class="flex-align flex-wrap form-location-wrapper">
-                    <div
-                        class="search-category d-flex h-48 select-border-end-0 radius-end-0 search-form d-sm-flex d-none">
+                <!DOCTYPE html>
+<html lang="en">
+<form action="#" class="flex-align flex-wrap form-location-wrapper">
+    <!-- Search Category Section (Optional) -->
+    <div class="search-category d-flex h-48 select-border-end-0 radius-end-0 search-form d-sm-flex d-none">
+        <div class="search-form__wrapper position-relative">
+            <input type="text"
+                class="search-form__input common-input py-13 ps-16 pe-18 rounded-end-pill pe-44"
+                placeholder="Search for a product or brand">
+            <button type="submit"
+                class="w-32 h-32 bg-main-600 rounded-circle flex-center text-xl text-white position-absolute top-50 translate-middle-y inset-inline-end-0 me-8">
+                <i class="ph ph-magnifying-glass"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Location Selection Section -->
+   <div class="location-box bg-white flex-align gap-8 py-6 px-16 rounded-pill border border-gray-100">
+    <span class="text-gray-900 text-xl d-xs-flex d-none">
+        <i class="ph ph-map-pin"></i>
+    </span>
+    <div class="line-height-1">
+        <span class="text-gray-600 text-xs">Your Location</span>
+        <div class="line-height-1"  style="border: none;">
+            <select id="countrySelect" class="js-example-basic-single border-none focus:outline-none focus:ring-0" style="border: none; outline: none; box-shadow: none;">
+            </select>
+        </div>
+    </div>
+</div>
 
 
-                        <div class="search-form__wrapper position-relative">
-                            <input type="text"
-                                class="search-form__input common-input py-13 ps-16 pe-18 rounded-end-pill pe-44"
-                                placeholder="Search for a product or brand">
-                            <button type="submit"
-                                class="w-32 h-32 bg-main-600 rounded-circle flex-center text-xl text-white position-absolute top-50 translate-middle-y inset-inline-end-0 me-8"><i
-                                    class="ph ph-magnifying-glass"></i></button>
-                        </div>
-                    </div>
-
-                    <div class="location-box bg-white flex-align gap-8 py-6 px-16 rounded-pill border border-gray-100">
-                        <span class="text-gray-900 text-xl d-xs-flex d-none"><i class="ph ph-map-pin"></i></span>
-                        <div class="line-height-1">
-                            <span class="text-gray-600 text-xs">Your Location</span>
-                            <div class="line-height-1">
-                                <select class="js-example-basic-single border border-gray-200 border-end-0"
-                                    name="state">
-                                    <option value="1">AED</option>
-                                    <option value="1">UAE</option>
-                                    <option value="1">Bahrain</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-
-                <!-- form location start -->
+</form>                <!-- form location start -->
 
                 <!-- Header Middle Right start -->
                 <div class="header-right flex-align d-lg-block d-none">
@@ -188,7 +189,7 @@
                                 <i class="ph ph-magnifying-glass"></i>
                             </span>
                         </button>
-                        <a href="cart.html" class="flex-align gap-4 item-hover">
+                        <a href="wishlist.html" class="flex-align gap-4 item-hover">
                             <span class="text-2xl text-gray-700 d-flex position-relative me-6 mt-6 item-hover__text">
                                 <i class="ph ph-heart"></i>
                                 <span
@@ -515,8 +516,7 @@
                 <div class="col-xxl-2 col-lg-3 col-sm-4 col-6">
                     <div
                         class="product-card px-8 py-16 border border-gray-100 hover-border-main-600 rounded-16 position-relative transition-2">
-
-
+                    
                         <a href="product-details.html" class="product-card__thumb flex-center above">
                             <img src="assets/images/thumbs/category1.png" alt="">
                         </a>
@@ -2956,6 +2956,7 @@
 
     <!-- flash sales -->
     <script src="assets/js/flashsale.js"></script>
+    <script src="assets/js/fetchcountries.js"></script>
 
 
 </body>

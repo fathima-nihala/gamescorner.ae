@@ -10,7 +10,7 @@ class CartManager {
         this.updateCartButton = document.querySelector('.text-lg.text-gray-500');
 
         // API configuration
-        this.baseApiUrl = 'http://localhost:5002/api';
+        this.baseApiUrl = 'http://localhost:5001/api';
         this.initialize();
     }
 

@@ -179,15 +179,13 @@
                     </div>
 
                     <div class="location-box bg-white flex-align gap-8 py-6 px-16 rounded-pill border border-gray-100">
-                        <span class="text-gray-900 text-xl d-xs-flex d-none"><i class="ph ph-map-pin"></i></span>
+                        <span class="text-gray-900 text-xl d-xs-flex d-none">
+                            <i class="ph ph-map-pin"></i>
+                        </span>
                         <div class="line-height-1">
                             <span class="text-gray-600 text-xs">Your Location</span>
-                            <div class="line-height-1">
-                                <select class="js-example-basic-single border border-gray-200 border-end-0"
-                                    name="state">
-                                    <option value="1">AED</option>
-                                    <option value="1">UAE</option>
-                                    <option value="1">Bahrain</option>
+                            <div class="line-height-1"  style="border: none;">
+                                <select id="countrySelect" class="js-example-basic-single border-none focus:outline-none focus:ring-0" style="border: none; outline: none; box-shadow: none;">
                                 </select>
                             </div>
                         </div>
@@ -203,7 +201,7 @@
                                 <i class="ph ph-magnifying-glass"></i>
                             </span>
                         </button>
-                        <a href="cart.html" class="flex-align gap-4 item-hover">
+                        <a href="wishlist.html" class="flex-align gap-4 item-hover">
                             <span class="text-2xl text-gray-700 d-flex position-relative me-6 mt-6 item-hover__text">
                                 <i class="ph ph-heart"></i>
                                 <span
@@ -1069,6 +1067,7 @@
     <!-- product details -->
     <script src="assets/js/product-details.js"></script>
     <script src="assets/js/categories.js"></script>
+    <script src="assets/js/fetchcountries.js"></script>
 
 
 

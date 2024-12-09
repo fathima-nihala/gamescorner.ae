@@ -356,13 +356,22 @@ class ProductListing {
     }
 
     createProductCard(product) {
+        // Retrieve the selected country from localStorage
+        const selectedCountry = JSON.parse(localStorage.getItem('selectedCountry')) || 
+            { country_code: 'AED', currency: 'AED' };
+        
+        const selectedCurrencyCode = selectedCountry.country_code || 'AED';
+    
         const imageUrl = product.image || '/placeholder.jpg';
-        const aedPricing = product.country_pricing.find(pricing => pricing.currency_code === 'AED');
-        const price = aedPricing?.unit_price || 'N/A';
-        const discount = aedPricing?.discount || 'N/A';
-        const currencyCode = aedPricing ? aedPricing.currency_code : 'N/A';
-
-
+        
+        const currencyPricing = product.country_pricing.find(pricing => 
+            pricing.currency_code === selectedCurrencyCode
+        ) || product.country_pricing.find(pricing => pricing.currency_code === 'AED');
+    
+        const price = currencyPricing?.unit_price || 'N/A';
+        const discount = currencyPricing?.discount || 'N/A';
+        const currencyCode = currencyPricing ? currencyPricing.currency_code : 'AED';
+    
         return `
             <div class="product-card h-100 p-4 border border-gray-200 rounded-lg hover:border-blue-600 transition-all">
                  <a href="product-details.html?id=${product._id}" class="product-card__thumb flex-center rounded-8 bg-gray-50 position-relative">
@@ -376,8 +385,8 @@ class ProductListing {
                     <a href="product-details.html" class="link text-line-2">${product.name}</a>
                 </h6>
                 <div class="product-card__price my-20">
-                      <span class="text-gray-400 text-md fw-semibold text-decoration-line-through">AED ${price}</span>
-                      <span class="text-heading text-md fw-semibold ">AED ${discount}<span
+                      <span class="text-gray-400 text-md fw-semibold text-decoration-line-through">${selectedCountry.country_code || 'AED'} ${price}</span>
+                      <span class="text-heading text-md fw-semibold ">${selectedCountry.country_code || 'AED'} ${discount}<span
                       class="text-gray-500 fw-normal"></span> </span>
                  </div>
                   <a href="" class="product-card__cart btn bg-gray-50 text-heading hover-bg-main-600 hover-text-white py-11 px-24 rounded-8 flex-center gap-8 fw-medium" tabindex="0" data-product-id="${product._id}" data-product-price="${price}" data-product-discount="${discount}" data-product-currencycode="${currencyCode}" data-product-quantity="1"  onClick="handleAddToCart(event)">
@@ -385,7 +394,6 @@ class ProductListing {
                     </a>
                 </div>
             </div>
-                
         `;
     }
 
@@ -523,3 +531,7 @@ function handleAddToCart(event) {
             alert('Error occurred while adding the product to the cart: ' + error.message);
         });
 }
+
+
+
+
