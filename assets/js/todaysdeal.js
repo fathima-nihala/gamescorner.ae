@@ -86,10 +86,22 @@ class TodaysDealsManager {
     carouselContainer.classList.add("deals-carousel");
 
     products.forEach((product) => {
-      const pricing =
-        product.country_pricing.find(
-          (p) => p.country === "United Arab Emirates"
-        ) || product.country_pricing[0];
+      // Get selected country from localStorage
+      const savedCountryString = localStorage.getItem("selectedCountry");
+      let selectedCountry = null;
+
+      try {
+        selectedCountry = savedCountryString ? JSON.parse(savedCountryString) : null;
+      } catch (error) {
+        console.error('Error parsing saved country:', error);
+      }
+
+      // Find pricing based on selected country or default to first pricing
+      const pricing = selectedCountry
+        ? product.country_pricing.find(
+            (p) => p.country === selectedCountry.name
+          ) || product.country_pricing[0]
+        : product.country_pricing[0];
 
       const dealItem = document.createElement("div");
       dealItem.classList.add("deals-item");

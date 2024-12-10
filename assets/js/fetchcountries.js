@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const fetchCountries = async () => {
         try {
             console.log("Fetching countries...");
-            const response = await fetch("http://localhost:5001/api/country_web");
+            const response = await fetch("http://localhost:5002/api/country_web");
 
             if (!response.ok) {
                 throw new Error(`Failed to fetch countries: HTTP ${response.status}`);
@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         if (optionData.name === parsedCountry.name) {
                             countrySelect.value = option.value;
                             updateSelectedCountryDisplay(parsedCountry);
-                            triggerProductListingRefresh();
+                            refreshAllProductListings();
                             console.log("Restored previous country selection:", optionData);
                         }
                     } catch (parseError) {
@@ -106,14 +106,25 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // Function to trigger product listing refresh
-    const triggerProductListingRefresh = () => {
+    // Function to refresh all product listings
+    const refreshAllProductListings = () => {
+        // Dispatch custom events to trigger refresh for different product sections
+        document.dispatchEvent(new CustomEvent('countryChanged'));
+        
+        // Additional specific refreshes if needed
+        if (typeof featuredManager !== 'undefined') {
+            featuredManager.fetchFeatured();
+        }
+
+        if (typeof todaysDealsManager !== 'undefined') {
+            todaysDealsManager.fetchTodaysDeals();
+        }
+
+        // Refresh product listing if it exists
         if (typeof productListing !== 'undefined' && productListing) {
             console.log("Refreshing product listing for new country");
             productListing.currentPage = 1;
             productListing.fetchProducts();
-        } else {
-            console.warn("Product listing not available for refresh");
         }
     };
 
@@ -133,8 +144,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Update country display
                 updateSelectedCountryDisplay(selectedCountry);
 
-                // Trigger product listing refresh
-                triggerProductListingRefresh();
+                // Refresh all product listings
+                refreshAllProductListings();
 
                 // Optional: Send selected country to backend
                 try {
@@ -173,15 +184,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Main initialization function
     const initCountrySelection = async () => {
-        // Fetch countries
         const countries = await fetchCountries();
-
-        // Populate dropdown
         populateDropdown(countries);
     };
 
-    // Initialize country selection
     initCountrySelection();
 });
-
-

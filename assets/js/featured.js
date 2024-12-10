@@ -81,10 +81,20 @@ class FeaturedManager {
     carouselWrapper.classList.add("slick-carousel");
 
     products.forEach((product) => {
-      const pricing =
-        product.country_pricing.find(
-          (p) => p.country === "United Arab Emirates"
-        ) || product.country_pricing[0];
+      const savedCountryString = localStorage.getItem("selectedCountry");
+      let selectedCountry = null;
+
+      try {
+        selectedCountry = savedCountryString ? JSON.parse(savedCountryString) : null;
+      } catch (error) {
+        console.error('Error parsing saved country:', error);
+      }
+
+      const pricing = selectedCountry
+    ? product.country_pricing.find(
+        (p) => p.country === selectedCountry.name
+      ) || product.country_pricing[0]
+    : product.country_pricing[0];
 
       const productItem = document.createElement("div");
       productItem.classList.add("flex-align");
@@ -98,8 +108,8 @@ class FeaturedManager {
         <div class="product-card__content mt-20 flex-grow">
           <h6 class="title text-lg fw-semibold mt-8   text-line-1">
             <a href="product-details.html?id=${product._id}" class="link">${
-              product.name || "Unnamed Product"
-            }</a>
+        product.name || "Unnamed Product"
+      }</a>
           </h6> 
           <div class="flex-align gap-16 mt-10">
            <div class="w-160 h-160 rounded-12 border border-gray-100 flex-shrink-0">
