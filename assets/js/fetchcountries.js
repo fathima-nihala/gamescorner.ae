@@ -73,8 +73,10 @@ document.addEventListener("DOMContentLoaded", () => {
                         const optionData = JSON.parse(option.value || '{}');
                         if (optionData.name === parsedCountry.name) {
                             countrySelect.value = option.value;
-                            updateSelectedCountryDisplay(parsedCountry);
-                            refreshAllProductListings();
+                            
+                            // Trigger country selection immediately
+                            handleCountrySelection({ target: countrySelect });
+                            
                             console.log("Restored previous country selection:", optionData);
                         }
                     } catch (parseError) {
@@ -106,26 +108,44 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // Function to refresh all product listings
+    // Function to refresh all product listings with a Promise-based approach
     const refreshAllProductListings = () => {
-        // Dispatch custom events to trigger refresh for different product sections
-        document.dispatchEvent(new CustomEvent('countryChanged'));
-        
-        // Additional specific refreshes if needed
-        if (typeof featuredManager !== 'undefined') {
-            featuredManager.fetchFeatured();
-        }
+        return new Promise((resolve) => {
+            // Dispatch custom events to trigger refresh for different product sections
+            document.dispatchEvent(new CustomEvent('countryChanged'));
+            
+            // Use setTimeout to ensure async event handling
+            setTimeout(() => {
+                // Specific refreshes with error handling
+                try {
+                    if (typeof featuredManager !== 'undefined') {
+                        featuredManager.fetchFeatured();
+                    }
+                } catch (error) {
+                    console.error("Error refreshing featured products:", error);
+                }
 
-        if (typeof todaysDealsManager !== 'undefined') {
-            todaysDealsManager.fetchTodaysDeals();
-        }
+                try {
+                    if (typeof todaysDealsManager !== 'undefined') {
+                        todaysDealsManager.fetchTodaysDeals();
+                    }
+                } catch (error) {
+                    console.error("Error refreshing today's deals:", error);
+                }
 
-        // Refresh product listing if it exists
-        if (typeof productListing !== 'undefined' && productListing) {
-            console.log("Refreshing product listing for new country");
-            productListing.currentPage = 1;
-            productListing.fetchProducts();
-        }
+                try {
+                    if (typeof productListing !== 'undefined' && productListing) {
+                        console.log("Refreshing product listing for new country");
+                        productListing.currentPage = 1;
+                        productListing.fetchProducts();
+                    }
+                } catch (error) {
+                    console.error("Error refreshing product listing:", error);
+                }
+
+                resolve();
+            }, 100);  // Small delay to ensure event propagation
+        });
     };
 
     // Country selection event listener
@@ -141,11 +161,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Store the selected country in localStorage
                 localStorage.setItem('selectedCountry', JSON.stringify(selectedCountry));
 
-                // Update country display
+                // Update country display IMMEDIATELY
                 updateSelectedCountryDisplay(selectedCountry);
 
                 // Refresh all product listings
-                refreshAllProductListings();
+                await refreshAllProductListings();
 
                 // Optional: Send selected country to backend
                 try {
